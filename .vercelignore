@@ -1,0 +1,11 @@
+node_modules
+.next
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store
+JPG/
+JPG 2/
+JPG 3/
+LOGO-INNOVACION-200PX.jpg
+sello-amwc.PNG
+Video_De_Desarme_De_Cánula_Con_Láser.mp4
