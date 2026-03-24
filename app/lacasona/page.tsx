@@ -2,6 +2,16 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import ImageSlider from "@/components/ImageSlider";
+
+const SLIDER_IMAGES = [
+  { src: "/hotels/lacasona/fachada.jpeg", alt: "Fachada de La Casona Hotel Boutique" },
+  { src: "/hotels/lacasona/habitacion-terraza.jpeg", alt: "Habitación con terraza" },
+  { src: "/hotels/lacasona/habitacion-doble.jpeg", alt: "Habitación doble" },
+  { src: "/hotels/lacasona/suite-cocina.jpeg", alt: "Suite con cocina y TV" },
+  { src: "/hotels/lacasona/jacuzzi.jpeg", alt: "Jacuzzi con mosaicos artesanales" },
+  { src: "/hotels/lacasona/terraza-hamaca.jpeg", alt: "Terraza con silla colgante" },
+];
 
 const LINKS = [
   {
@@ -177,6 +187,15 @@ export default function LaCasonaPage() {
               Rodeado de naturaleza y cultura, en el corazón de Laureles
             </p>
           </div>
+        </motion.div>
+
+        {/* Image Slider */}
+        <motion.div variants={itemVariants} className="w-full">
+          <ImageSlider
+            images={SLIDER_IMAGES}
+            accentColor="#8b5e3c"
+            borderColor="#edddd0"
+          />
         </motion.div>
 
         {/* Stats */}

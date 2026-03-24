@@ -2,6 +2,17 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import ImageSlider from "@/components/ImageSlider";
+
+const SLIDER_IMAGES = [
+  { src: "/hotels/terrabella/habitacion-piedra.jpeg", alt: "Habitación con muro de piedra" },
+  { src: "/hotels/terrabella/habitacion-madera.jpeg", alt: "Habitación amplia en madera" },
+  { src: "/hotels/terrabella/piscina-interior.jpeg", alt: "Piscina interior" },
+  { src: "/hotels/terrabella/jacuzzi-suite.jpeg", alt: "Suite con jacuzzi" },
+  { src: "/hotels/terrabella/jacuzzi-relax.jpeg", alt: "Zona de relajación con jacuzzi" },
+  { src: "/hotels/terrabella/exterior-bambu.jpeg", alt: "Exterior rodeado de bambú" },
+  { src: "/hotels/terrabella/terraza-deck.jpeg", alt: "Terraza y deck exterior" },
+];
 
 const LINKS = [
   {
@@ -169,6 +180,15 @@ export default function TerrabellaPage() {
               Refugio de naturaleza y bienestar en las montañas de Antioquia
             </p>
           </div>
+        </motion.div>
+
+        {/* Image Slider */}
+        <motion.div variants={itemVariants} className="w-full">
+          <ImageSlider
+            images={SLIDER_IMAGES}
+            accentColor="#b8936a"
+            borderColor="#e8ddd0"
+          />
         </motion.div>
 
         {/* Stats */}

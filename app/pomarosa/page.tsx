@@ -2,6 +2,15 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import ImageSlider from "@/components/ImageSlider";
+
+const SLIDER_IMAGES = [
+  { src: "/hotels/pomarosa/entrada-hotel.jpeg", alt: "Entrada del Hotel Poma Rosa" },
+  { src: "/hotels/pomarosa/habitacion-doble.jpeg", alt: "Habitación doble" },
+  { src: "/hotels/pomarosa/recepcion.jpeg", alt: "Recepción del hotel" },
+  { src: "/hotels/pomarosa/lobby.jpeg", alt: "Lobby y entrada interior" },
+  { src: "/hotels/pomarosa/cocina.jpeg", alt: "Cocina compartida" },
+];
 
 const LINKS = [
   {
@@ -162,6 +171,16 @@ export default function PomaRosaPage() {
               Tu refugio boutique en el corazón de Laureles‑Estadio
             </p>
           </div>
+        </motion.div>
+
+        {/* Image Slider */}
+        <motion.div variants={itemVariants} className="w-full">
+          <ImageSlider
+            images={SLIDER_IMAGES}
+            accentColor="#c9a53a"
+            dotColor="#c9a53a"
+            borderColor="rgba(201,165,58,0.3)"
+          />
         </motion.div>
 
         {/* Stats */}

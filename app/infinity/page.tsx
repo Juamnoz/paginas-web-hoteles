@@ -2,6 +2,17 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import ImageSlider from "@/components/ImageSlider";
+
+const SLIDER_IMAGES = [
+  { src: "/hotels/infinity/fachada.jpeg", alt: "Fachada del Infinity Hotel" },
+  { src: "/hotels/infinity/suite-premium.jpeg", alt: "Suite Premium con jacuzzi" },
+  { src: "/hotels/infinity/suite-gold.jpeg", alt: "Suite Gold con jacuzzi" },
+  { src: "/hotels/infinity/habitacion-estandar.jpeg", alt: "Habitación estándar" },
+  { src: "/hotels/infinity/habitacion-diamante.jpeg", alt: "Habitación Diamante" },
+  { src: "/hotels/infinity/habitacion-tv.jpeg", alt: "Habitación con minibar y TV" },
+  { src: "/hotels/infinity/bano-ducha.jpeg", alt: "Baño con ducha de cristal" },
+];
 
 const LINKS = [
   {
@@ -180,6 +191,16 @@ export default function InfinityPage() {
               Estilo contemporáneo a dos cuadras del Boulevard de la 70
             </p>
           </div>
+        </motion.div>
+
+        {/* Image Slider */}
+        <motion.div variants={itemVariants} className="w-full">
+          <ImageSlider
+            images={SLIDER_IMAGES}
+            accentColor="#c8a84b"
+            dotColor="#c8a84b"
+            borderColor="rgba(200,168,75,0.3)"
+          />
         </motion.div>
 
         {/* Stats */}
