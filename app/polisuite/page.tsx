@@ -262,16 +262,35 @@ export default function PoliSuitePage() {
           ))}
         </motion.div>
 
-        {/* Location */}
-        <motion.div
-          variants={itemVariants}
-          className="flex items-center gap-2 text-sm"
-          style={{ color: "#9a7070" }}
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
-            <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.083 3.978-5.121 3.978-8.827a8.25 8.25 0 00-16.5 0c0 3.706 2.034 6.744 3.978 8.827a19.576 19.576 0 002.854 2.715l.018.013.004.003zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-          </svg>
-          <span>Cra. 52 #51-2, Sector Pérez, Bello, Antioquia</span>
+        {/* Map */}
+        <motion.div variants={itemVariants} className="w-full px-2">
+          <div
+            className="w-full rounded-2xl overflow-hidden shadow-sm"
+            style={{ border: "1px solid #ede8e3" }}
+          >
+            <iframe
+              src="https://maps.google.com/maps?q=Hotel+Polisuites+Bello+Antioquia&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="180"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Ubicación Hotel Polisuite"
+            />
+          </div>
+          <a
+            href="https://www.google.com/maps/search/Hotel+Polisuites+Bello+Antioquia"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 text-sm mt-2 hover:underline"
+            style={{ color: "#9a7070" }}
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+              <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.083 3.978-5.121 3.978-8.827a8.25 8.25 0 00-16.5 0c0 3.706 2.034 6.744 3.978 8.827a19.576 19.576 0 002.854 2.715l.018.013.004.003zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+            </svg>
+            <span>Cra. 52 #51-2, Sector Pérez, Bello, Antioquia</span>
+          </a>
         </motion.div>
 
         {/* Footer */}
