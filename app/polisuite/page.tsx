@@ -2,6 +2,17 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import ImageSlider from "@/components/ImageSlider";
+
+const SLIDER_IMAGES = [
+  { src: "/hotels/polisuite/habitacion-tropical.jpeg", alt: "Habitación estilo tropical" },
+  { src: "/hotels/polisuite/habitacion-elegante.jpeg", alt: "Habitación elegante" },
+  { src: "/hotels/polisuite/habitacion-dorada.jpeg", alt: "Habitación dorada" },
+  { src: "/hotels/polisuite/habitacion-roja.jpeg", alt: "Habitación con cabecera roja" },
+  { src: "/hotels/polisuite/habitacion-madera.jpeg", alt: "Habitación con acabados en madera" },
+  { src: "/hotels/polisuite/habitacion-sillon.jpeg", alt: "Habitación con sillón" },
+  { src: "/hotels/polisuite/bano-jacuzzi.jpeg", alt: "Baño con jacuzzi" },
+];
 
 const LINKS = [
   {
@@ -143,6 +154,15 @@ export default function PoliSuitePage() {
               Habitaciones cómodas con atención cordial en el sector Pérez de Bello
             </p>
           </div>
+        </motion.div>
+
+        {/* Image Slider */}
+        <motion.div variants={itemVariants} className="w-full">
+          <ImageSlider
+            images={SLIDER_IMAGES}
+            accentColor="#8b3040"
+            borderColor="#ede8e3"
+          />
         </motion.div>
 
         {/* Stats */}
