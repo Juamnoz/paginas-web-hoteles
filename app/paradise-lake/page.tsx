@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import TechnoBackground from "./TechnoBackground";
 
@@ -97,7 +97,7 @@ const PROGRAM = [
   },
 ];
 
-export default function ParadiseLakePage() {
+function ParadiseLakePageInner() {
   const [copiedWA, setCopiedWA] = useState(false);
   const [loadingPago, setLoadingPago] = useState(false);
   const [pagoStatus, setPagoStatus] = useState<"exitoso" | "fallido" | "pendiente" | null>(null);
@@ -718,5 +718,13 @@ export default function ParadiseLakePage() {
         </motion.div>
       </motion.div>
     </div>
+  );
+}
+
+export default function ParadiseLakePage() {
+  return (
+    <Suspense>
+      <ParadiseLakePageInner />
+    </Suspense>
   );
 }
