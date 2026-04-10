@@ -102,6 +102,8 @@ function ParadiseLakePageInner() {
   const [loadingPago, setLoadingPago] = useState(false);
   const [pagoStatus, setPagoStatus] = useState<"exitoso" | "fallido" | "pendiente" | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({ pareja: 0, individual: 0, transporte: 0 });
+  const [abonoInput, setAbonoInput] = useState("");
+  const [loadingAbono, setLoadingAbono] = useState(false);
   const searchParams = useSearchParams();
 
   const DEPOSIT_UNIT = 50000;
@@ -125,6 +127,38 @@ function ParadiseLakePageInner() {
       window.history.replaceState({}, "", "/paradise-lake");
     }
   }, [searchParams]);
+
+  const abonoValue = parseInt(abonoInput.replace(/\D/g, ""), 10) || 0;
+
+  const handleAbonoInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    const num = parseInt(raw, 10);
+    setAbonoInput(raw === "" ? "" : num.toLocaleString("es-CO"));
+  };
+
+  const handleAbono = async () => {
+    if (abonoValue < 10000) return;
+    setLoadingAbono(true);
+    try {
+      const res = await fetch("/api/paradise-lake/preference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: [{ id: "abono-libre", title: "Abono – Paradise Lake Guatapé", quantity: 1, deposit: abonoValue }],
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("No se pudo generar el link de pago. Intenta de nuevo.");
+      }
+    } catch {
+      alert("Error de conexión. Intenta de nuevo.");
+    } finally {
+      setLoadingAbono(false);
+    }
+  };
 
   const handleWA = () => {
     window.open(
@@ -621,6 +655,87 @@ function ParadiseLakePageInner() {
               </motion.button>
               <p className="text-center text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>
                 Pago seguro vía Mercado Pago · Saldo restante antes del 28 abr
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Abono libre */}
+        <motion.div variants={itemVariants} className="w-full px-1">
+          <div
+            className="w-full rounded-2xl overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(43,175,158,0.08) 0%, rgba(247,148,29,0.04) 100%)",
+              border: "1px solid rgba(43,175,158,0.25)",
+            }}
+          >
+            <div
+              className="px-5 py-4"
+              style={{ borderBottom: "1px solid rgba(43,175,158,0.12)" }}
+            >
+              <p className="font-black text-base" style={{ color: "#ffffff" }}>
+                💸 Abonar a mi cupo
+              </p>
+              <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
+                Paga cualquier monto que quieras en cualquier momento
+              </p>
+            </div>
+            <div className="px-5 py-4 flex flex-col gap-3">
+              <div
+                className="flex items-center gap-2 rounded-xl px-4 py-3"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(43,175,158,0.2)" }}
+              >
+                <span className="text-base font-black" style={{ color: "#2BAF9E" }}>$</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={abonoInput}
+                  onChange={handleAbonoInput}
+                  className="flex-1 bg-transparent outline-none text-base font-bold"
+                  style={{ color: "#ffffff", caretColor: "#2BAF9E" }}
+                />
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>COP</span>
+              </div>
+              {abonoValue > 0 && abonoValue < 10000 && (
+                <p className="text-xs" style={{ color: "#ff6b6b" }}>Mínimo $10.000</p>
+              )}
+              <motion.button
+                onClick={handleAbono}
+                disabled={loadingAbono || abonoValue < 10000}
+                whileHover={{ scale: loadingAbono || abonoValue < 10000 ? 1 : 1.02 }}
+                whileTap={{ scale: loadingAbono || abonoValue < 10000 ? 1 : 0.97 }}
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm"
+                style={{
+                  background: loadingAbono || abonoValue < 10000
+                    ? "rgba(43,175,158,0.08)"
+                    : "linear-gradient(135deg, #009ee3 0%, #0077b6 100%)",
+                  color: loadingAbono || abonoValue < 10000 ? "rgba(255,255,255,0.3)" : "#ffffff",
+                  cursor: loadingAbono || abonoValue < 10000 ? "not-allowed" : "pointer",
+                  boxShadow: loadingAbono || abonoValue < 10000 ? "none" : "0 0 24px rgba(0,158,227,0.3)",
+                }}
+              >
+                {loadingAbono ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <circle cx="12" cy="12" r="10" strokeOpacity={0.25} />
+                      <path d="M12 2a10 10 0 0110 10" />
+                    </svg>
+                    Generando link…
+                  </>
+                ) : abonoValue >= 10000 ? (
+                  <>
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 shrink-0">
+                      <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                    </svg>
+                    Abonar {fmt(abonoValue)}
+                  </>
+                ) : (
+                  <>Ingresa el monto a abonar</>
+                )}
+              </motion.button>
+              <p className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
+                Pago seguro vía Mercado Pago
               </p>
             </div>
           </div>
