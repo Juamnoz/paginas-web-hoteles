@@ -9,7 +9,7 @@ type SelectedItem = { id: string; title: string; quantity: number; deposit: numb
 
 export async function POST(req: NextRequest) {
   try {
-    const origin = req.headers.get("origin") || "http://localhost:3004";
+    const origin = process.env.NEXT_PUBLIC_BASE_URL || req.headers.get("origin") || "http://localhost:3004";
     const body = await req.json().catch(() => ({ items: [] }));
     const selectedItems: SelectedItem[] = body.items ?? [];
 
@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
           failure: `${origin}/paradise-lake?pago=fallido`,
           pending: `${origin}/paradise-lake?pago=pendiente`,
         },
+        auto_return: "approved",
         statement_descriptor: "PARADISE LAKE",
         payment_methods: {
           excluded_payment_types: [],
