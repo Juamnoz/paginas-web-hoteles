@@ -19,7 +19,7 @@ const itemVariants = {
 };
 
 const HIGHLIGHTS = [
-  { value: "6", label: "DJs en vivo" },
+  { value: "6", label: "DJs · 2 días" },
   { value: "24h", label: "Música non-stop" },
   { value: "Barra", label: "Libre 1–3 PM" },
   { value: "May 1–2", label: "Vie + Sáb" },
@@ -84,7 +84,7 @@ const PROGRAM = [
     items: [
       { time: "12:00 PM", desc: "Apertura de puertas" },
       { time: "1:00 – 3:00 PM", desc: "🍹 Barra libre" },
-      { time: "Desde las 2 PM", desc: "Techno & Techno House · 3 DJs" },
+      { time: "Desde las 2 PM", desc: "Techno & Techno House · 6 DJs los 2 días" },
     ],
   },
   {
@@ -92,7 +92,7 @@ const PROGRAM = [
     tag: "🎛️ Techno",
     items: [
       { time: "Todo el día", desc: "Techno & Techno House non-stop" },
-      { time: "Non-stop", desc: "3 DJs · 24 horas de música" },
+      { time: "Non-stop", desc: "6 DJs · 24 horas de música · 2 días" },
     ],
   },
 ];
