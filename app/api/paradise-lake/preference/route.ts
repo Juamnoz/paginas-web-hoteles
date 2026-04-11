@@ -42,6 +42,21 @@ export async function POST(req: NextRequest) {
     if (session) {
       const totalAmount =
         selectedItems.reduce((acc, i) => acc + i.deposit * (i.quantity || 1), 0) || 50000;
+
+      // Enforce minimum: $50.000 first payment, $10.000 subsequent
+      const { data: existingPayments } = await supabase
+        .from("paradise_lake_payments")
+        .select("id")
+        .eq("user_id", session.id)
+        .eq("status", "approved");
+      const isFirstPayment = !existingPayments || existingPayments.length === 0;
+      const minAmount = isFirstPayment ? 50000 : 10000;
+      if (totalAmount < minAmount) {
+        return NextResponse.json(
+          { error: `El monto mínimo es ${isFirstPayment ? "$50.000 para el primer pago" : "$10.000"}.` },
+          { status: 400 }
+        );
+      }
       const { data: paymentRecord } = await supabase
         .from("paradise_lake_payments")
         .insert({ user_id: session.id, amount: totalAmount, status: "pending" })

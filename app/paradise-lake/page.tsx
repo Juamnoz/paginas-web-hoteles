@@ -102,6 +102,7 @@ function ParadiseLakePageInner() {
   const approvedPayments = payments.filter((p) => p.status === "approved");
   const totalPaid = approvedPayments.reduce((acc, p) => acc + p.amount, 0);
   const totalOwed = reservations.reduce((acc, r) => acc + r.total_price, 0);
+  const minAbono = totalPaid === 0 ? 50000 : 10000;
   const remaining = Math.max(0, totalOwed - totalPaid);
 
   // Load session on mount
@@ -260,7 +261,7 @@ function ParadiseLakePageInner() {
   };
 
   const handleAbono = async () => {
-    if (abonoValue < 10000) return;
+    if (abonoValue < minAbono) return;
     setLoadingAbono(true);
     try {
       const res = await fetch("/api/paradise-lake/preference", {
@@ -626,20 +627,25 @@ function ParadiseLakePageInner() {
                     style={{ color: "#ffffff", caretColor: "#2BAF9E" }} />
                   <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>COP</span>
                 </div>
-                {abonoValue > 0 && abonoValue < 10000 && (
-                  <p className="text-xs" style={{ color: "#ff6b6b" }}>Mínimo $10.000</p>
+                {abonoValue > 0 && abonoValue < minAbono && (
+                  <p className="text-xs" style={{ color: "#ff6b6b" }}>
+                    {totalPaid === 0 ? "Primer pago mínimo $50.000" : "Mínimo $10.000"}
+                  </p>
                 )}
-                <motion.button onClick={handleAbono} disabled={loadingAbono || abonoValue < 10000}
-                  whileHover={{ scale: loadingAbono || abonoValue < 10000 ? 1 : 1.02 }}
-                  whileTap={{ scale: loadingAbono || abonoValue < 10000 ? 1 : 0.97 }}
+                {abonoValue === 0 && totalPaid === 0 && (
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Primer abono mínimo $50.000</p>
+                )}
+                <motion.button onClick={handleAbono} disabled={loadingAbono || abonoValue < minAbono}
+                  whileHover={{ scale: loadingAbono || abonoValue < minAbono ? 1 : 1.02 }}
+                  whileTap={{ scale: loadingAbono || abonoValue < minAbono ? 1 : 0.97 }}
                   className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm"
                   style={{
-                    background: loadingAbono || abonoValue < 10000 ? "rgba(43,175,158,0.08)" : "linear-gradient(135deg, #009ee3 0%, #0077b6 100%)",
-                    color: loadingAbono || abonoValue < 10000 ? "rgba(255,255,255,0.3)" : "#ffffff",
-                    cursor: loadingAbono || abonoValue < 10000 ? "not-allowed" : "pointer",
-                    boxShadow: loadingAbono || abonoValue < 10000 ? "none" : "0 0 24px rgba(0,158,227,0.3)",
+                    background: loadingAbono || abonoValue < minAbono ? "rgba(43,175,158,0.08)" : "linear-gradient(135deg, #009ee3 0%, #0077b6 100%)",
+                    color: loadingAbono || abonoValue < minAbono ? "rgba(255,255,255,0.3)" : "#ffffff",
+                    cursor: loadingAbono || abonoValue < minAbono ? "not-allowed" : "pointer",
+                    boxShadow: loadingAbono || abonoValue < minAbono ? "none" : "0 0 24px rgba(0,158,227,0.3)",
                   }}>
-                  {loadingAbono ? <><Spinner /> Generando link…</> : abonoValue >= 10000 ? <>
+                  {loadingAbono ? <><Spinner /> Generando link…</> : abonoValue >= minAbono ? <>
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 shrink-0"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" /></svg>
                     Pagar {fmt(abonoValue)}
                   </> : <>Ingresa el monto a abonar</>}
