@@ -43,17 +43,34 @@ export async function POST(req: NextRequest) {
       const totalAmount =
         selectedItems.reduce((acc, i) => acc + i.deposit * (i.quantity || 1), 0) || 50000;
 
-      // Enforce minimum: $50.000 first payment, $10.000 subsequent
+      // Enforce minimum: $50.000/persona first payment, $10.000 subsequent
       const { data: existingPayments } = await supabase
         .from("paradise_lake_payments")
         .select("id")
         .eq("user_id", session.id)
         .eq("status", "approved");
       const isFirstPayment = !existingPayments || existingPayments.length === 0;
-      const minAmount = isFirstPayment ? 50000 : 10000;
-      if (totalAmount < minAmount) {
+
+      if (isFirstPayment) {
+        const { data: userReservations } = await supabase
+          .from("paradise_lake_reservations")
+          .select("room_type, quantity")
+          .eq("user_id", session.id)
+          .eq("status", "active");
+        const totalPersons = (userReservations ?? []).reduce((acc, r) => {
+          const pp = r.room_type === "pareja" ? 2 : r.room_type === "individual" ? 1 : 0;
+          return acc + pp * r.quantity;
+        }, 0);
+        const minAmount = Math.max(50000, totalPersons * 50000);
+        if (totalAmount < minAmount) {
+          return NextResponse.json(
+            { error: `El primer pago mínimo es ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(minAmount)} ($50.000 por persona).` },
+            { status: 400 }
+          );
+        }
+      } else if (totalAmount < 10000) {
         return NextResponse.json(
-          { error: `El monto mínimo es ${isFirstPayment ? "$50.000 para el primer pago" : "$10.000"}.` },
+          { error: "El monto mínimo por abono es $10.000." },
           { status: 400 }
         );
       }

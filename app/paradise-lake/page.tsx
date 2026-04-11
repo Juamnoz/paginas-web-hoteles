@@ -102,7 +102,11 @@ function ParadiseLakePageInner() {
   const approvedPayments = payments.filter((p) => p.status === "approved");
   const totalPaid = approvedPayments.reduce((acc, p) => acc + p.amount, 0);
   const totalOwed = reservations.reduce((acc, r) => acc + r.total_price, 0);
-  const minAbono = totalPaid === 0 ? 50000 : 10000;
+  const totalPersons = reservations.reduce((acc, r) => {
+    const pp = r.room_type === "pareja" ? 2 : r.room_type === "individual" ? 1 : 0;
+    return acc + pp * r.quantity;
+  }, 0);
+  const minAbono = totalPaid === 0 ? Math.max(50000, totalPersons * 50000) : 10000;
   const remaining = Math.max(0, totalOwed - totalPaid);
 
   // Load session on mount
