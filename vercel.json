@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/paradise-lake/cron/reminder-8d",
+      "schedule": "0 15 23 4 *"
+    },
+    {
+      "path": "/api/paradise-lake/cron/reminder-4d",
+      "schedule": "0 15 27 4 *"
+    },
+    {
+      "path": "/api/paradise-lake/cron/reminder-3d",
+      "schedule": "0 15 28 4 *"
+    },
+    {
+      "path": "/api/paradise-lake/cron/event-day",
+      "schedule": "0 13 1 5 *"
+    }
+  ]
+}
