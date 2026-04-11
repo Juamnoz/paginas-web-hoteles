@@ -1,5 +1,7 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/session";
+import { supabase } from "@/lib/supabase-server";
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -12,13 +14,14 @@ export async function POST(req: NextRequest) {
     const origin = process.env.NEXT_PUBLIC_BASE_URL || req.headers.get("origin") || "http://localhost:3004";
     const body = await req.json().catch(() => ({ items: [] }));
     const selectedItems: SelectedItem[] = body.items ?? [];
+    const session = await getSession();
 
     const items =
       selectedItems.length > 0
         ? selectedItems.map((item) => ({
             id: `paradise-lake-${item.id}`,
-            title: `Depósito – ${item.title}`,
-            description: "Saldo restante debe pagarse antes del 28 de abril.",
+            title: `Abono – ${item.title}`,
+            description: "Paradise Lake Guatapé · 1 y 2 de Mayo",
             quantity: item.quantity,
             unit_price: item.deposit,
             currency_id: "COP",
@@ -26,19 +29,32 @@ export async function POST(req: NextRequest) {
         : [
             {
               id: "paradise-lake-deposito",
-              title: "Separar cupo – Paradise Lake Guatapé",
-              description: "Depósito para reservar cupo. Saldo restante debe pagarse antes del 28 de abril.",
+              title: "Abono – Paradise Lake Guatapé",
+              description: "Paradise Lake · 1 y 2 de Mayo",
               quantity: 1,
               unit_price: 50000,
               currency_id: "COP",
             },
           ];
 
-    const preference = new Preference(client);
+    // Create pending payment record for logged-in users
+    let paymentRecordId: string | null = null;
+    if (session) {
+      const totalAmount =
+        selectedItems.reduce((acc, i) => acc + i.deposit * (i.quantity || 1), 0) || 50000;
+      const { data: paymentRecord } = await supabase
+        .from("paradise_lake_payments")
+        .insert({ user_id: session.id, amount: totalAmount, status: "pending" })
+        .select("id")
+        .single();
+      paymentRecordId = paymentRecord?.id ?? null;
+    }
 
+    const preference = new Preference(client);
     const result = await preference.create({
       body: {
         items,
+        external_reference: paymentRecordId || undefined,
         back_urls: {
           success: `${origin}/paradise-lake?pago=exitoso`,
           failure: `${origin}/paradise-lake?pago=fallido`,
@@ -46,20 +62,21 @@ export async function POST(req: NextRequest) {
         },
         auto_return: "approved",
         statement_descriptor: "PARADISE LAKE",
-        payment_methods: {
-          excluded_payment_types: [],
-          installments: 1,
-        },
+        payment_methods: { installments: 1 },
       },
     });
 
+    if (paymentRecordId && result.id) {
+      await supabase
+        .from("paradise_lake_payments")
+        .update({ mp_preference_id: result.id })
+        .eq("id", paymentRecordId);
+    }
+
     const url = result.init_point ?? result.sandbox_init_point;
-    return NextResponse.json({ url });
-  } catch (err) {
-    console.error("MP preference error:", err);
-    return NextResponse.json(
-      { error: "No se pudo crear el link de pago." },
-      { status: 500 }
-    );
+    return NextResponse.json({ url, paymentRecordId });
+  } catch (err: unknown) {
+    console.error("MP preference error:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "No se pudo crear el link de pago." }, { status: 500 });
   }
 }
