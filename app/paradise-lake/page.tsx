@@ -42,7 +42,10 @@ const PROGRAM = [
 const ROOMS = [
   { id: "pareja", title: "Habitación en pareja", price: "$600.000", priceValue: 600000, unit: "por pareja", personas: 2, detail: "15 habitaciones disponibles · Se agotan rápido", primary: true, badge: "Incluye estadía", icon: "🏠" },
   { id: "individual", title: "Boleta individual", price: "$250.000", priceValue: 250000, unit: "por persona", personas: 1, detail: "Acceso al evento sin estadía", primary: false, badge: "Sin estadía", icon: "🎫" },
-  { id: "transporte", title: "Transporte ida y vuelta", price: "$40.000", priceValue: 40000, unit: "por persona", personas: 1, detail: "Salida y regreso incluidos", primary: false, badge: "Opcional", icon: "🚌" },
+];
+
+const ADDONS = [
+  { id: "transporte", title: "Transporte ida y vuelta", price: "$40.000", priceValue: 40000, unit: "por persona", personas: 1, detail: "Salida desde Medellín y regreso incluidos", badge: "Opcional", icon: "🚌" },
 ];
 
 type SessionUser = { id: string; name: string; email: string };
@@ -83,6 +86,7 @@ function ParadiseLakePageInner() {
 
   // Room selection (guest)
   const [quantities, setQuantities] = useState<Record<string, number>>({ pareja: 0, individual: 0, transporte: 0 });
+  const ALL_PRODUCTS = [...ROOMS, ...ADDONS];
 
   // Payment
   const [abonoInput, setAbonoInput] = useState("");
@@ -92,8 +96,8 @@ function ParadiseLakePageInner() {
   const searchParams = useSearchParams();
 
   // Derived
-  const totalSelected = ROOMS.reduce((acc, r) => acc + (quantities[r.id] ?? 0) * r.priceValue, 0);
-  const hasSelection = totalSelected > 0;
+  const totalSelected = ALL_PRODUCTS.reduce((acc, r) => acc + (quantities[r.id] ?? 0) * r.priceValue, 0);
+  const hasSelection = ROOMS.reduce((acc, r) => acc + (quantities[r.id] ?? 0), 0) > 0;
   const abonoValue = parseInt(abonoInput.replace(/\D/g, ""), 10) || 0;
   const approvedPayments = payments.filter((p) => p.status === "approved");
   const totalPaid = approvedPayments.reduce((acc, p) => acc + p.amount, 0);
@@ -163,7 +167,7 @@ function ParadiseLakePageInner() {
     setLoadingAuth(true);
     setAuthError("");
     try {
-      const selectedRooms = ROOMS.filter((r) => (quantities[r.id] ?? 0) > 0).map((r) => ({
+      const selectedRooms = ALL_PRODUCTS.filter((r) => (quantities[r.id] ?? 0) > 0).map((r) => ({
         id: r.id,
         title: r.title,
         priceValue: r.priceValue,
@@ -386,6 +390,7 @@ function ParadiseLakePageInner() {
           /* ── GUEST: Room selector + auth CTA ── */
           <>
             <motion.div variants={itemVariants} className="w-full px-1">
+              {/* Main tickets */}
               <p className="text-xs tracking-widest uppercase mb-3 px-1" style={{ color: "rgba(255,255,255,0.35)" }}>Elige tu experiencia</p>
               <div className="flex flex-col gap-3">
                 {ROOMS.map((room) => {
@@ -430,17 +435,77 @@ function ParadiseLakePageInner() {
                 })}
               </div>
 
+              {/* Add-ons */}
+              <div className="mt-4">
+                <p className="text-xs tracking-widest uppercase mb-2 px-1" style={{ color: "rgba(255,255,255,0.25)" }}>Agregar al pedido</p>
+                <div className="flex flex-col gap-2">
+                  {ADDONS.map((addon) => {
+                    const qty = quantities[addon.id] ?? 0;
+                    const selected = qty > 0;
+                    return (
+                      <div key={addon.id} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
+                        style={selected
+                          ? { background: "rgba(43,175,158,0.12)", border: "1px solid rgba(43,175,158,0.4)" }
+                          : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderStyle: "dashed" }
+                        }
+                      >
+                        <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-xl"
+                          style={{ background: selected ? "rgba(43,175,158,0.2)" : "rgba(255,255,255,0.05)" }}>
+                          {addon.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-sm" style={{ color: selected ? "#ffffff" : "rgba(255,255,255,0.7)" }}>{addon.title}</p>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "rgba(43,175,158,0.15)", color: "#2BAF9E", border: "1px solid rgba(43,175,158,0.25)" }}>
+                              {addon.badge}
+                            </span>
+                          </div>
+                          <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+                            {addon.price} <span style={{ color: "rgba(255,255,255,0.2)" }}>{addon.unit}</span>
+                            {selected && <span style={{ color: "#2BAF9E" }}> · +{fmt(qty * addon.priceValue)} al total</span>}
+                          </p>
+                          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>{addon.detail}</p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button onClick={() => adjustQty(addon.id, -1)} disabled={qty === 0} className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold transition-all"
+                            style={{ background: qty === 0 ? "rgba(255,255,255,0.03)" : "rgba(43,175,158,0.15)", color: qty === 0 ? "rgba(255,255,255,0.2)" : "#2BAF9E", border: `1px solid ${qty === 0 ? "rgba(255,255,255,0.07)" : "rgba(43,175,158,0.3)"}`, cursor: qty === 0 ? "not-allowed" : "pointer" }}>−</button>
+                          <span className="w-5 text-center font-black text-sm" style={{ color: qty > 0 ? "#2BAF9E" : "rgba(255,255,255,0.25)" }}>{qty}</span>
+                          <button onClick={() => adjustQty(addon.id, 1)} className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold"
+                            style={{ background: "rgba(43,175,158,0.15)", color: "#2BAF9E", border: "1px solid rgba(43,175,158,0.3)", cursor: "pointer" }}>+</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Selection summary */}
               {hasSelection && (
-                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-3 rounded-xl px-4 py-3 flex justify-between items-center" style={{ background: "rgba(247,148,29,0.06)", border: "1px solid rgba(247,148,29,0.15)" }}>
-                  <div>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Separa hoy</p>
-                    <p className="font-black text-base" style={{ color: "#F7941D" }}>{fmt(ROOMS.reduce((acc, r) => acc + (quantities[r.id] ?? 0) * DEPOSIT_UNIT * r.personas, 0))}</p>
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(247,148,29,0.06)", border: "1px solid rgba(247,148,29,0.15)" }}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Separa hoy</p>
+                      <p className="font-black text-base" style={{ color: "#F7941D" }}>{fmt(ALL_PRODUCTS.reduce((acc, r) => acc + (quantities[r.id] ?? 0) * DEPOSIT_UNIT * r.personas, 0))}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Total</p>
+                      <p className="font-black text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{fmt(totalSelected)}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Total</p>
-                    <p className="font-black text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{fmt(totalSelected)}</p>
-                  </div>
+                  {(quantities["transporte"] ?? 0) > 0 && (
+                    <div className="mt-2 pt-2 flex flex-col gap-0.5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                      {ROOMS.filter(r => (quantities[r.id] ?? 0) > 0).map(r => (
+                        <p key={r.id} className="text-[11px] flex justify-between" style={{ color: "rgba(255,255,255,0.35)" }}>
+                          <span>{r.title} ×{quantities[r.id]}</span>
+                          <span>{fmt(quantities[r.id] * r.priceValue)}</span>
+                        </p>
+                      ))}
+                      <p className="text-[11px] flex justify-between" style={{ color: "rgba(43,175,158,0.8)" }}>
+                        <span>🚌 Transporte ×{quantities["transporte"]}</span>
+                        <span>+{fmt(quantities["transporte"] * 40000)}</span>
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </motion.div>
