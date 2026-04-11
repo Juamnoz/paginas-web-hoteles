@@ -633,11 +633,11 @@ function ParadiseLakePageInner() {
                 </div>
                 {abonoValue > 0 && abonoValue < minAbono && (
                   <p className="text-xs" style={{ color: "#ff6b6b" }}>
-                    {totalPaid === 0 ? "Primer pago mínimo $50.000" : "Mínimo $10.000"}
+                    {totalPaid === 0 ? `Primer pago mínimo ${fmt(minAbono)} ($50.000 por persona)` : "Mínimo $10.000"}
                   </p>
                 )}
                 {abonoValue === 0 && totalPaid === 0 && (
-                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Primer abono mínimo $50.000</p>
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Primer abono mínimo {fmt(minAbono)} · $50.000 por persona</p>
                 )}
                 <motion.button onClick={handleAbono} disabled={loadingAbono || abonoValue < minAbono}
                   whileHover={{ scale: loadingAbono || abonoValue < minAbono ? 1 : 1.02 }}
