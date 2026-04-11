@@ -627,105 +627,117 @@ function ParadiseLakePageInner() {
       </motion.div>
 
       {/* ══════════════════════════════════════════════
-          AUTH MODAL
+          AUTH MODAL — iOS 26 / Vercel style
       ══════════════════════════════════════════════ */}
       <AnimatePresence>
         {authOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 pb-0 sm:pb-4"
-            style={{ background: "rgba(2,5,9,0.85)", backdropFilter: "blur(6px)" }}
+            style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(20px) saturate(180%)" }}
             onClick={(e) => { if (e.target === e.currentTarget) setAuthOpen(false); }}>
-            <motion.div initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-[430px] rounded-t-3xl sm:rounded-3xl overflow-hidden"
-              style={{ background: "#0d1b2e", border: "1px solid rgba(247,148,29,0.2)", boxShadow: "0 -8px 48px rgba(0,0,0,0.6)" }}>
+            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
+              transition={{ type: "spring", damping: 30, stiffness: 350 }}
+              className="w-full max-w-[420px] rounded-t-[28px] sm:rounded-[28px] overflow-hidden"
+              style={{ background: "#141414", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.8)" }}>
 
-              {/* Modal header */}
-              <div className="flex items-center justify-between px-6 pt-5 pb-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="flex gap-1 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.05)" }}>
+              {/* Drag handle (mobile) */}
+              <div className="flex justify-center pt-3 pb-1 sm:hidden">
+                <div className="w-10 h-1 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
+              </div>
+
+              {/* Tab bar */}
+              <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                <div className="flex gap-0 p-0.5 rounded-[10px]" style={{ background: "rgba(255,255,255,0.07)" }}>
                   {(["register", "login"] as const).map((mode) => (
                     <button key={mode} onClick={() => { setAuthMode(mode); setAuthError(""); }}
-                      className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                      className="px-4 py-1.5 rounded-[8px] text-[13px] font-semibold transition-all"
                       style={authMode === mode
-                        ? { background: "#F7941D", color: "#000000" }
-                        : { color: "rgba(255,255,255,0.4)" }}>
+                        ? { background: "rgba(255,255,255,0.12)", color: "#ffffff", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }
+                        : { color: "rgba(255,255,255,0.35)" }}>
                       {mode === "register" ? "Registrarse" : "Ya tengo cuenta"}
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setAuthOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>✕</button>
+                <button onClick={() => setAuthOpen(false)}
+                  className="w-7 h-7 flex items-center justify-center rounded-full text-xs"
+                  style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }}>✕</button>
               </div>
 
-              <div className="px-6 py-5 flex flex-col gap-4">
-                {/* Register form */}
-                {authMode === "register" && (
-                  <>
-                    <div>
-                      <p className="text-base font-black mb-1" style={{ color: "#ffffff" }}>Crea tu cuenta</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>Tu reserva y abonos quedan guardados aquí</p>
-                    </div>
-                    {[
-                      { key: "name", label: "Nombre completo", placeholder: "Tu nombre", type: "text" },
-                      { key: "email", label: "Email", placeholder: "tu@email.com", type: "email" },
-                      { key: "phone", label: "Teléfono (opcional)", placeholder: "+57 300 000 0000", type: "tel" },
-                      { key: "password", label: "Contraseña", placeholder: "Mínimo 6 caracteres", type: "password" },
-                    ].map(({ key, label, placeholder, type }) => (
-                      <div key={key}>
-                        <label className="text-xs font-semibold mb-1.5 block" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</label>
-                        <input type={type} placeholder={placeholder} value={authForm[key as keyof typeof authForm]}
-                          onChange={(e) => setAuthForm((f) => ({ ...f, [key]: e.target.value }))}
-                          className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff" }} />
-                      </div>
-                    ))}
-                    {/* Room summary */}
-                    {hasSelection && (
-                      <div className="rounded-xl px-4 py-3" style={{ background: "rgba(247,148,29,0.08)", border: "1px solid rgba(247,148,29,0.2)" }}>
-                        <p className="text-xs font-semibold mb-1" style={{ color: "#F7941D" }}>🎟️ Cupos seleccionados</p>
-                        {ROOMS.filter((r) => (quantities[r.id] ?? 0) > 0).map((r) => (
-                          <p key={r.id} className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
-                            {r.icon} {r.title} × {quantities[r.id]} — {fmt(r.priceValue * (quantities[r.id] ?? 0))}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
+              <div className="px-5 pb-6 flex flex-col gap-3">
+                {/* Heading */}
+                <div className="mb-1">
+                  <p className="text-[20px] font-semibold tracking-tight" style={{ color: "#ffffff", letterSpacing: "-0.3px" }}>
+                    {authMode === "register" ? "Crea tu cuenta" : "Bienvenido de vuelta"}
+                  </p>
+                  <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+                    {authMode === "register" ? "Tu reserva y abonos quedan guardados aquí" : "Ingresa para ver tus reservas y abonos"}
+                  </p>
+                </div>
 
-                {/* Login form */}
-                {authMode === "login" && (
-                  <>
-                    <div>
-                      <p className="text-base font-black mb-1" style={{ color: "#ffffff" }}>Bienvenido de vuelta</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>Ingresa para ver tus reservas y abonos</p>
-                    </div>
-                    {[
-                      { key: "email", label: "Email", placeholder: "tu@email.com", type: "email" },
-                      { key: "password", label: "Contraseña", placeholder: "Tu contraseña", type: "password" },
-                    ].map(({ key, label, placeholder, type }) => (
-                      <div key={key}>
-                        <label className="text-xs font-semibold mb-1.5 block" style={{ color: "rgba(255,255,255,0.5)" }}>{label}</label>
-                        <input type={type} placeholder={placeholder} value={authForm[key as keyof typeof authForm]}
-                          onChange={(e) => setAuthForm((f) => ({ ...f, [key]: e.target.value }))}
-                          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                          className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#ffffff" }} />
+                {/* Fields */}
+                {authMode === "register" && [
+                  { key: "name", label: "Nombre completo", placeholder: "Tu nombre", type: "text" },
+                  { key: "email", label: "Email", placeholder: "tu@email.com", type: "email" },
+                  { key: "phone", label: "Teléfono (opcional)", placeholder: "+57 300 000 0000", type: "tel" },
+                  { key: "password", label: "Contraseña", placeholder: "Mínimo 6 caracteres", type: "password" },
+                ].map(({ key, label, placeholder, type }) => (
+                  <div key={key}>
+                    <label className="text-[11px] font-medium mb-1.5 block" style={{ color: "rgba(255,255,255,0.4)", letterSpacing: "0.3px", textTransform: "uppercase" }}>{label}</label>
+                    <input type={type} placeholder={placeholder} value={authForm[key as keyof typeof authForm]}
+                      onChange={(e) => setAuthForm((f) => ({ ...f, [key]: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-[12px] text-[15px] outline-none transition-all"
+                      style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#ffffff" }} />
+                  </div>
+                ))}
+
+                {authMode === "login" && [
+                  { key: "email", label: "Email", placeholder: "tu@email.com", type: "email" },
+                  { key: "password", label: "Contraseña", placeholder: "Tu contraseña", type: "password" },
+                ].map(({ key, label, placeholder, type }) => (
+                  <div key={key}>
+                    <label className="text-[11px] font-medium mb-1.5 block" style={{ color: "rgba(255,255,255,0.4)", letterSpacing: "0.3px", textTransform: "uppercase" }}>{label}</label>
+                    <input type={type} placeholder={placeholder} value={authForm[key as keyof typeof authForm]}
+                      onChange={(e) => setAuthForm((f) => ({ ...f, [key]: e.target.value }))}
+                      onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                      className="w-full px-4 py-3 rounded-[12px] text-[15px] outline-none"
+                      style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", color: "#ffffff" }} />
+                  </div>
+                ))}
+
+                {/* Room summary */}
+                {authMode === "register" && hasSelection && (
+                  <div className="rounded-[12px] px-4 py-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <p className="text-[11px] font-medium mb-2" style={{ color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Cupos seleccionados</p>
+                    {ROOMS.filter((r) => (quantities[r.id] ?? 0) > 0).map((r) => (
+                      <div key={r.id} className="flex justify-between items-center py-0.5">
+                        <span className="text-[13px]" style={{ color: "rgba(255,255,255,0.7)" }}>{r.icon} {r.title} × {quantities[r.id]}</span>
+                        <span className="text-[13px] font-medium" style={{ color: "#ffffff" }}>{fmt(r.priceValue * (quantities[r.id] ?? 0))}</span>
                       </div>
                     ))}
-                  </>
+                  </div>
                 )}
 
                 {/* Error */}
                 {authError && (
-                  <p className="text-xs py-2 px-3 rounded-lg" style={{ background: "rgba(255,80,80,0.1)", color: "#ff6b6b", border: "1px solid rgba(255,80,80,0.2)" }}>{authError}</p>
+                  <p className="text-[13px] py-2.5 px-3.5 rounded-[10px]"
+                    style={{ background: "rgba(255,59,48,0.1)", color: "#ff6b6b", border: "1px solid rgba(255,59,48,0.2)" }}>
+                    {authError}
+                  </p>
                 )}
 
-                {/* Submit */}
+                {/* Submit button */}
                 <motion.button onClick={authMode === "register" ? handleRegister : handleLogin}
-                  disabled={loadingAuth} whileHover={{ scale: loadingAuth ? 1 : 1.02 }} whileTap={{ scale: loadingAuth ? 1 : 0.97 }}
-                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm mb-2"
-                  style={{ background: loadingAuth ? "rgba(247,148,29,0.2)" : "linear-gradient(135deg, #F7941D 0%, #e07b10 100%)", color: loadingAuth ? "rgba(255,255,255,0.4)" : "#000000", cursor: loadingAuth ? "not-allowed" : "pointer" }}>
-                  {loadingAuth ? <><Spinner /> Procesando…</> : authMode === "register" ? "Crear cuenta" : "Ingresar"}
+                  disabled={loadingAuth}
+                  whileHover={{ scale: loadingAuth ? 1 : 1.01 }}
+                  whileTap={{ scale: loadingAuth ? 1 : 0.98 }}
+                  className="w-full flex items-center justify-center gap-2 py-[14px] rounded-[14px] text-[15px] font-semibold mt-1"
+                  style={{
+                    background: loadingAuth ? "rgba(255,255,255,0.07)" : "#ffffff",
+                    color: loadingAuth ? "rgba(255,255,255,0.3)" : "#000000",
+                    cursor: loadingAuth ? "not-allowed" : "pointer",
+                    letterSpacing: "-0.2px",
+                  }}>
+                  {loadingAuth ? <><Spinner /> Procesando…</> : authMode === "register" ? "Crear cuenta" : "Iniciar sesión"}
                 </motion.button>
               </div>
             </motion.div>
@@ -740,66 +752,65 @@ function ParadiseLakePageInner() {
         {verifyOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center px-4"
-            style={{ background: "rgba(2,5,9,0.9)", backdropFilter: "blur(8px)" }}>
-            <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-[380px] rounded-3xl overflow-hidden"
-              style={{ background: "#0d1b2e", border: "1px solid rgba(247,148,29,0.3)", boxShadow: "0 0 60px rgba(247,148,29,0.15)" }}>
+            style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(20px) saturate(180%)" }}>
+            <motion.div initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ type: "spring", damping: 30, stiffness: 350 }}
+              className="w-full max-w-[360px] rounded-[28px] overflow-hidden"
+              style={{ background: "#141414", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.8)" }}>
 
-              <div className="px-7 pt-7 pb-2 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl"
-                  style={{ background: "rgba(247,148,29,0.12)", border: "1px solid rgba(247,148,29,0.25)" }}>
+              <div className="px-7 pt-8 pb-2 text-center">
+                <div className="w-14 h-14 mx-auto mb-5 rounded-[16px] flex items-center justify-center text-2xl"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
                   ✉️
                 </div>
-                <p className="font-black text-xl mb-2" style={{ color: "#ffffff" }}>Verifica tu email</p>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  Enviamos un código de 6 dígitos a tu correo. Ingrésalo aquí para confirmar tu cuenta y recibir tus boletas.
+                <p className="text-[20px] font-semibold tracking-tight mb-2" style={{ color: "#ffffff", letterSpacing: "-0.3px" }}>
+                  Verifica tu email
+                </p>
+                <p className="text-[13px] leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  Enviamos un código de 6 dígitos a tu correo. Ingrésalo para activar tu cuenta y recibir tus boletas.
                 </p>
               </div>
 
-              <div className="px-7 pb-7 flex flex-col gap-4 mt-4">
-                {/* 6-digit input */}
+              <div className="px-7 pb-7 flex flex-col gap-3 mt-5">
                 <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={6}
-                  placeholder="_ _ _ _ _ _"
+                  type="text" inputMode="numeric" maxLength={6}
+                  placeholder="000000"
                   value={verifyCode}
                   onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   onKeyDown={(e) => e.key === "Enter" && handleVerify()}
-                  className="w-full text-center text-3xl font-black tracking-[0.5em] py-4 rounded-2xl outline-none"
+                  className="w-full text-center text-[32px] font-semibold tracking-[0.4em] py-4 rounded-[14px] outline-none"
                   style={{
                     background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(247,148,29,0.3)",
-                    color: "#F7941D",
-                    caretColor: "#F7941D",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "#ffffff",
+                    caretColor: "#ffffff",
+                    letterSpacing: "0.35em",
                   }}
                 />
 
                 {verifyError && (
-                  <p className="text-xs text-center py-2 px-3 rounded-lg"
-                    style={{ background: "rgba(255,80,80,0.1)", color: "#ff6b6b", border: "1px solid rgba(255,80,80,0.2)" }}>
+                  <p className="text-[13px] text-center py-2.5 px-3 rounded-[10px]"
+                    style={{ background: "rgba(255,59,48,0.1)", color: "#ff6b6b", border: "1px solid rgba(255,59,48,0.2)" }}>
                     {verifyError}
                   </p>
                 )}
 
                 <motion.button onClick={handleVerify} disabled={loadingVerify || verifyCode.length !== 6}
-                  whileHover={{ scale: loadingVerify || verifyCode.length !== 6 ? 1 : 1.02 }}
-                  whileTap={{ scale: loadingVerify || verifyCode.length !== 6 ? 1 : 0.97 }}
-                  className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm"
+                  whileHover={{ scale: loadingVerify || verifyCode.length !== 6 ? 1 : 1.01 }}
+                  whileTap={{ scale: loadingVerify || verifyCode.length !== 6 ? 1 : 0.98 }}
+                  className="w-full flex items-center justify-center gap-2 py-[14px] rounded-[14px] text-[15px] font-semibold"
                   style={{
-                    background: loadingVerify || verifyCode.length !== 6
-                      ? "rgba(247,148,29,0.1)"
-                      : "linear-gradient(135deg, #F7941D 0%, #e07b10 100%)",
-                    color: loadingVerify || verifyCode.length !== 6 ? "rgba(255,255,255,0.3)" : "#000000",
+                    background: loadingVerify || verifyCode.length !== 6 ? "rgba(255,255,255,0.07)" : "#ffffff",
+                    color: loadingVerify || verifyCode.length !== 6 ? "rgba(255,255,255,0.25)" : "#000000",
                     cursor: loadingVerify || verifyCode.length !== 6 ? "not-allowed" : "pointer",
                   }}>
-                  {loadingVerify ? <><Spinner /> Verificando…</> : "Confirmar código →"}
+                  {loadingVerify ? <><Spinner /> Verificando…</> : "Confirmar"}
                 </motion.button>
 
                 <div className="text-center">
                   <button onClick={handleResendCode} disabled={resendCooldown > 0}
-                    className="text-xs" style={{ color: resendCooldown > 0 ? "rgba(255,255,255,0.25)" : "rgba(247,148,29,0.7)" }}>
+                    className="text-[13px]"
+                    style={{ color: resendCooldown > 0 ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.5)" }}>
                     {resendCooldown > 0 ? `Reenviar en ${resendCooldown}s` : "¿No llegó? Reenviar código"}
                   </button>
                 </div>
