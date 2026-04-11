@@ -8,8 +8,8 @@ export async function POST(req: NextRequest) {
   try {
     const { name, email, phone, password, rooms } = await req.json();
 
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
+    if (!name || !email || !phone || !password) {
+      return NextResponse.json({ error: "Completa todos los campos" }, { status: 400 });
     }
 
     const { data: existing } = await supabase

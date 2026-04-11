@@ -165,8 +165,8 @@ function ParadiseLakePageInner() {
   };
 
   const handleRegister = async () => {
-    if (!authForm.name || !authForm.email || !authForm.password) {
-      setAuthError("Completa nombre, email y contraseña");
+    if (!authForm.name || !authForm.email || !authForm.phone || !authForm.password) {
+      setAuthError("Completa todos los campos");
       return;
     }
     setLoadingAuth(true);
@@ -753,7 +753,7 @@ function ParadiseLakePageInner() {
                 {authMode === "register" && [
                   { key: "name", label: "Nombre completo", placeholder: "Tu nombre", type: "text" },
                   { key: "email", label: "Email", placeholder: "tu@email.com", type: "email" },
-                  { key: "phone", label: "Teléfono (opcional)", placeholder: "+57 300 000 0000", type: "tel" },
+                  { key: "phone", label: "Teléfono", placeholder: "+57 300 000 0000", type: "tel" },
                   { key: "password", label: "Contraseña", placeholder: "Mínimo 6 caracteres", type: "password" },
                 ].map(({ key, label, placeholder, type }) => (
                   <div key={key}>
