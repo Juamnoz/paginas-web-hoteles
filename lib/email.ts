@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://fiesta-1y2-mayo-guatape.vercel.app";
+const BASE_URL = (process.env.NEXT_PUBLIC_BASE_URL || "https://fiesta-1y2-mayo-guatape.vercel.app").trim();
 const LOGO_URL = `${BASE_URL}/logo-paradise-lake.jpeg`;
 
 // ─── Verification email — Apple style ───────────────────────────────────────
@@ -142,12 +142,13 @@ export async function sendTicketsEmail(to: string, name: string, tickets: Ticket
   const ticketsWithQR = await Promise.all(
     tickets.map(async (t) => {
       const qrData = `PARADISE-LAKE-2025|${t.ticketId}|${t.holderName}|${t.roomType}|${t.personNumber}`;
-      const qrDataUrl = await QRCode.toDataURL(qrData, {
-        width: 160,
-        margin: 1,
+      const qrBuffer = await QRCode.toBuffer(qrData, {
+        width: 200,
+        margin: 2,
         color: { dark: "#000000", light: "#ffffff" },
       });
-      return { ...t, qrDataUrl };
+      const cid = `qr-${t.ticketId.replace(/[^a-z0-9]/gi, "")}@paradise-lake`;
+      return { ...t, qrBuffer, cid };
     })
   );
 
@@ -229,7 +230,7 @@ export async function sendTicketsEmail(to: string, name: string, tickets: Ticket
             <!-- QR -->
             <td align="center" style="vertical-align:top;">
               <div style="background:#ffffff;padding:8px;border-radius:10px;display:inline-block;">
-                <img src="${t.qrDataUrl}" width="120" height="120" style="display:block;" alt="QR"/>
+                <img src="cid:${t.cid}" width="120" height="120" style="display:block;" alt="QR"/>
               </div>
               <p style="margin:8px 0 0;font-size:9px;color:rgba(255,255,255,0.2);
                 font-family:monospace;text-align:center;">
@@ -315,5 +316,11 @@ export async function sendTicketsEmail(to: string, name: string, tickets: Ticket
     to,
     subject: `Tus boletas para Paradise Lake — 1 y 2 de Mayo`,
     html,
+    attachments: ticketsWithQR.map((t) => ({
+      filename: `qr-${t.personNumber}.png`,
+      content: t.qrBuffer,
+      cid: t.cid,
+      contentType: "image/png",
+    })),
   });
 }

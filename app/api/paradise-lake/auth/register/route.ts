@@ -67,10 +67,12 @@ export async function POST(req: NextRequest) {
       .update({ verification_code: code, code_expires_at: expires })
       .eq("id", user.id);
 
-    // Send verification email (non-blocking)
-    sendVerificationEmail(user.email, user.name, code).catch((e) =>
-      console.error("Email send error:", e)
-    );
+    // Send verification email
+    try {
+      await sendVerificationEmail(user.email, user.name, code);
+    } catch (emailErr) {
+      console.error("Email send error:", emailErr);
+    }
 
     await createSession({ id: user.id, email: user.email, name: user.name });
 
