@@ -70,6 +70,12 @@ function ParadiseLakePageInner() {
 
   // Auth modal
   const [authOpen, setAuthOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [verifyCode, setVerifyCode] = useState("");
+  const [loadingVerify, setLoadingVerify] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [authMode, setAuthMode] = useState<"login" | "register">("register");
   const [authForm, setAuthForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [authError, setAuthError] = useState("");
@@ -175,6 +181,11 @@ function ParadiseLakePageInner() {
       setPayments([]);
       setAuthOpen(false);
       setAuthForm({ name: "", email: "", phone: "", password: "" });
+      // Open verification modal
+      setPendingUserId(data.user.id);
+      setVerifyOpen(true);
+      setVerifyCode("");
+      setVerifyError("");
     } catch { setAuthError("Error de conexión"); }
     finally { setLoadingAuth(false); }
   };
@@ -197,6 +208,38 @@ function ParadiseLakePageInner() {
       refreshUserData();
     } catch { setAuthError("Error de conexión"); }
     finally { setLoadingAuth(false); }
+  };
+
+  const handleVerify = async () => {
+    if (verifyCode.length !== 6 || !pendingUserId) return;
+    setLoadingVerify(true);
+    setVerifyError("");
+    try {
+      const res = await fetch("/api/paradise-lake/auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: verifyCode, userId: pendingUserId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setVerifyError(data.error || "Código incorrecto"); return; }
+      setVerifyOpen(false);
+      setPendingUserId(null);
+      setVerifyCode("");
+    } catch { setVerifyError("Error de conexión"); }
+    finally { setLoadingVerify(false); }
+  };
+
+  const handleResendCode = async () => {
+    if (!pendingUserId || resendCooldown > 0) return;
+    await fetch("/api/paradise-lake/auth/resend-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: pendingUserId }),
+    });
+    setResendCooldown(60);
+    const interval = setInterval(() => {
+      setResendCooldown((c) => { if (c <= 1) { clearInterval(interval); return 0; } return c - 1; });
+    }, 1000);
   };
 
   const handleLogout = async () => {
@@ -684,6 +727,82 @@ function ParadiseLakePageInner() {
                   style={{ background: loadingAuth ? "rgba(247,148,29,0.2)" : "linear-gradient(135deg, #F7941D 0%, #e07b10 100%)", color: loadingAuth ? "rgba(255,255,255,0.4)" : "#000000", cursor: loadingAuth ? "not-allowed" : "pointer" }}>
                   {loadingAuth ? <><Spinner /> Procesando…</> : authMode === "register" ? "Crear cuenta" : "Ingresar"}
                 </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ══════════════════════════════════════════════
+          VERIFICATION MODAL
+      ══════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {verifyOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            style={{ background: "rgba(2,5,9,0.9)", backdropFilter: "blur(8px)" }}>
+            <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="w-full max-w-[380px] rounded-3xl overflow-hidden"
+              style={{ background: "#0d1b2e", border: "1px solid rgba(247,148,29,0.3)", boxShadow: "0 0 60px rgba(247,148,29,0.15)" }}>
+
+              <div className="px-7 pt-7 pb-2 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl"
+                  style={{ background: "rgba(247,148,29,0.12)", border: "1px solid rgba(247,148,29,0.25)" }}>
+                  ✉️
+                </div>
+                <p className="font-black text-xl mb-2" style={{ color: "#ffffff" }}>Verifica tu email</p>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  Enviamos un código de 6 dígitos a tu correo. Ingrésalo aquí para confirmar tu cuenta y recibir tus boletas.
+                </p>
+              </div>
+
+              <div className="px-7 pb-7 flex flex-col gap-4 mt-4">
+                {/* 6-digit input */}
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="_ _ _ _ _ _"
+                  value={verifyCode}
+                  onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  onKeyDown={(e) => e.key === "Enter" && handleVerify()}
+                  className="w-full text-center text-3xl font-black tracking-[0.5em] py-4 rounded-2xl outline-none"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(247,148,29,0.3)",
+                    color: "#F7941D",
+                    caretColor: "#F7941D",
+                  }}
+                />
+
+                {verifyError && (
+                  <p className="text-xs text-center py-2 px-3 rounded-lg"
+                    style={{ background: "rgba(255,80,80,0.1)", color: "#ff6b6b", border: "1px solid rgba(255,80,80,0.2)" }}>
+                    {verifyError}
+                  </p>
+                )}
+
+                <motion.button onClick={handleVerify} disabled={loadingVerify || verifyCode.length !== 6}
+                  whileHover={{ scale: loadingVerify || verifyCode.length !== 6 ? 1 : 1.02 }}
+                  whileTap={{ scale: loadingVerify || verifyCode.length !== 6 ? 1 : 0.97 }}
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm"
+                  style={{
+                    background: loadingVerify || verifyCode.length !== 6
+                      ? "rgba(247,148,29,0.1)"
+                      : "linear-gradient(135deg, #F7941D 0%, #e07b10 100%)",
+                    color: loadingVerify || verifyCode.length !== 6 ? "rgba(255,255,255,0.3)" : "#000000",
+                    cursor: loadingVerify || verifyCode.length !== 6 ? "not-allowed" : "pointer",
+                  }}>
+                  {loadingVerify ? <><Spinner /> Verificando…</> : "Confirmar código →"}
+                </motion.button>
+
+                <div className="text-center">
+                  <button onClick={handleResendCode} disabled={resendCooldown > 0}
+                    className="text-xs" style={{ color: resendCooldown > 0 ? "rgba(255,255,255,0.25)" : "rgba(247,148,29,0.7)" }}>
+                    {resendCooldown > 0 ? `Reenviar en ${resendCooldown}s` : "¿No llegó? Reenviar código"}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

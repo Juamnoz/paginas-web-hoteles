@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { supabase } from "@/lib/supabase-server";
 import { createSession } from "@/lib/session";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -57,6 +58,19 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
+    // Generate verification code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const expires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+    await supabase
+      .from("paradise_lake_users")
+      .update({ verification_code: code, code_expires_at: expires })
+      .eq("id", user.id);
+
+    // Send verification email (non-blocking)
+    sendVerificationEmail(user.email, user.name, code).catch((e) =>
+      console.error("Email send error:", e)
+    );
 
     await createSession({ id: user.id, email: user.email, name: user.name });
 
