@@ -53,7 +53,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ url: result.init_point });
+    const url = result.init_point ?? result.sandbox_init_point;
+    return NextResponse.json({ url });
   } catch (err) {
     console.error("MP preference error:", err);
     return NextResponse.json(
