@@ -6,6 +6,7 @@ const SUBDOMAIN_MAP: Record<string, string> = {
   lacasona: "/lacasona",
   infinity: "/infinity",
   polisuite: "/polisuite",
+  "gran-imperio": "/gran-imperio",
 };
 
 export function middleware(req: NextRequest) {
