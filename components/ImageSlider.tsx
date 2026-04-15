@@ -97,6 +97,7 @@ export default function ImageSlider({
               sizes="(max-width: 430px) 100vw, 430px"
               priority={current === 0}
               draggable={false}
+              unoptimized={true}
             />
           </motion.div>
         </AnimatePresence>

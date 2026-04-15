@@ -126,6 +126,7 @@ export default function GranImperioPage() {
               width={112}
               height={112}
               className="w-full h-full object-contain"
+              unoptimized={true}
             />
           </div>
           <div className="text-center">
