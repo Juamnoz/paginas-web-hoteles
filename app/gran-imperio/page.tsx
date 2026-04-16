@@ -1,287 +1,1055 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import ImageSlider from "@/components/ImageSlider";
+import { motion } from "framer-motion";
+import {
+  ChevronLeft, ChevronRight, Menu, X,
+  Wifi, Coffee, Car, Shield,
+  UtensilsCrossed, PawPrint, MapPin,
+  Phone, Mail, Users,
+} from "lucide-react";
 
-const SLIDER_IMAGES = [
-  { src: "/hotels/gran-imperio/img-1.jpeg", alt: "Gran Imperio vista 1" },
-  { src: "/hotels/gran-imperio/img-2.jpeg", alt: "Gran Imperio vista 2" },
-  { src: "/hotels/gran-imperio/img-3.jpeg", alt: "Gran Imperio vista 3" },
-  { src: "/hotels/gran-imperio/img-4.jpeg", alt: "Gran Imperio vista 4" },
+// ─── Constants ────────────────────────────────────────────────────────────────
+const HOSROOM  = "https://sys.hosroom.com/booking/148-hotel-gran-imperio";
+const WA       = "https://wa.me/573128369410?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20Hotel%20Gran%20Imperio";
+const PHONE_   = "tel:+573128369410";
+const EMAIL_   = "mailto:hotelgranimperio1@gmail.com";
+const IG       = "https://www.instagram.com/hotelgranimperio";
+const GOLD     = "#d4af37";
+const GOLD_DK  = "#a88e32";
+const EASE     = [0.22, 1, 0.36, 1] as const;
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const NAV_LINKS = [
+  { href: "#habitaciones", label: "Habitaciones" },
+  { href: "#reservar",     label: "Reservar"      },
+  { href: "#galeria",      label: "Galería"       },
+  { href: "#servicios",    label: "Servicios"     },
+  { href: "#ubicacion",    label: "Ubicación"     },
+  { href: "#contacto",     label: "Contacto"      },
 ];
 
-const LINKS = [
+const ROOMS = [
   {
-    id: "reservar",
-    label: "Reservar Ahora",
-    sublabel: "Habitaciones exclusivas disponibles",
-    href: "https://wa.me/573128369410",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    ),
-    primary: true,
+    id: "doble",
+    name: "Habitación Doble",
+    capacity: "1 – 2 personas",
+    description:
+      "Acogedora habitación con cama doble o dos sencillas, baño privado en mármol negro, TV satelital y WiFi. Ideal para viajeros y parejas.",
+    amenities: ["Baño privado", "TV satelital", "WiFi", "Agua caliente", "A/C"],
+    images: [
+      "/hotels/gran-imperio/img-1.jpeg",
+      "/hotels/gran-imperio/heic-1.jpeg",
+      "/hotels/gran-imperio/bano-1.jpeg",
+    ],
   },
   {
-    id: "whatsapp",
-    label: "WhatsApp",
-    sublabel: "312 836 9410",
-    href: "https://wa.me/573128369410",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-      </svg>
-    ),
-    primary: false,
+    id: "triple",
+    name: "Habitación Triple",
+    capacity: "Hasta 3 personas",
+    description:
+      "Habitación espaciosa con tres camas individuales, perfecta para amigos o familias pequeñas. Baño privado de lujo y todos los servicios incluidos.",
+    amenities: ["Baño privado", "TV satelital", "WiFi", "Agua caliente", "A/C"],
+    images: [
+      "/hotels/gran-imperio/heic-3.jpeg",
+      "/hotels/gran-imperio/hab-multiple.jpeg",
+      "/hotels/gran-imperio/bano-2.jpeg",
+    ],
   },
   {
-    id: "instagram",
-    label: "Instagram",
-    sublabel: "@hotelgranimperio",
-    href: "https://www.instagram.com/hotelgranimperio",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-      </svg>
-    ),
-    primary: false,
-  },
-  {
-    id: "ubicacion",
-    label: "Ubicación",
-    sublabel: "69 # 43-32",
-    href: "https://www.google.com/maps/search/69+%23+43-32",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-        <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.083 3.978-5.121 3.978-8.827a8.25 8.25 0 00-16.5 0c0 3.706 2.034 6.744 3.978 8.827a19.576 19.576 0 002.854 2.715l.018.013.004.003zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-      </svg>
-    ),
-    primary: false,
-  },
-  {
-    id: "correo",
-    label: "Correo",
-    sublabel: "hotelgranimperio1@gmail.com",
-    href: "mailto:hotelgranimperio1@gmail.com",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-        <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
-        <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
-      </svg>
-    ),
-    primary: false,
+    id: "multiple",
+    name: "Habitación Múltiple",
+    capacity: "Hasta 5 personas",
+    description:
+      "Nuestra habitación más amplia para grupos y familias. Varias camas dobles, baño privado premium y espacio para todos. La estadía perfecta en Medellín.",
+    amenities: ["Baño privado", "TV satelital", "WiFi", "Agua caliente", "A/C", "Ventilador"],
+    images: [
+      "/hotels/gran-imperio/hab-multiple.jpeg",
+      "/hotels/gran-imperio/heic-1.jpeg",
+      "/hotels/gran-imperio/bano-3.jpeg",
+    ],
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.2 },
-  },
-};
+const GALLERY = [
+  { src: "/hotels/gran-imperio/hab-multiple.jpeg", alt: "Habitación múltiple" },
+  { src: "/hotels/gran-imperio/bano-1.jpeg",       alt: "Baño de lujo"        },
+  { src: "/hotels/gran-imperio/heic-1.jpeg",       alt: "Habitación doble"    },
+  { src: "/hotels/gran-imperio/bano-2.jpeg",       alt: "Ducha en vidrio"     },
+  { src: "/hotels/gran-imperio/heic-3.jpeg",       alt: "Habitación triple"   },
+  { src: "/hotels/gran-imperio/bano-3.jpeg",       alt: "Baño completo"       },
+];
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
+const AMENITIES = [
+  { Icon: Coffee,         label: "Desayuno americano",   desc: "Incluido en tu estadía"    },
+  { Icon: Wifi,           label: "WiFi alta velocidad",  desc: "En todas las áreas"         },
+  { Icon: Car,            label: "Parqueadero",          desc: "Disponible en el hotel"     },
+  { Icon: Shield,         label: "Seguridad 24 h",       desc: "Vigilancia permanente"      },
+  { Icon: UtensilsCrossed,label: "Snack Bar",            desc: "Bebidas y refrigerios"      },
+  { Icon: PawPrint,       label: "Pet Friendly",         desc: "Mascotas bienvenidas"       },
+];
 
-export default function GranImperioPage() {
+// ─── Animation variant ────────────────────────────────────────────────────────
+const fadeUp = (i = 0) => ({
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.6, delay: i * 0.1, ease: EASE },
+});
+
+// ─── WhatsApp Icon ────────────────────────────────────────────────────────────
+function WAIcon({ size = 20 }: { size?: number }) {
   return (
-    <div
-      className="min-h-screen flex items-start justify-center py-10 px-4 relative overflow-hidden"
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  );
+}
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+function Navbar() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <header
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: "linear-gradient(160deg, #111111 0%, #1a1a1a 50%, #0a0a0a 100%)",
-        color: "#f5f5f5"
+        background: scrolled ? "rgba(8,8,8,0.96)" : "transparent",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        borderBottom: scrolled ? `1px solid ${GOLD}25` : "1px solid transparent",
       }}
     >
-      {/* Background Video (Optional if desired but we keep a dark ambient static style here or can add a video tag below) */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover opacity-10 pointer-events-none"
-      >
-        <source src="/hotels/gran-imperio/bg-video.mp4" type="video/mp4" />
-      </video>
-
-      <motion.div
-        className="w-full max-w-[430px] flex flex-col items-center gap-6 relative z-10"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Header */}
-        <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 pt-2">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <a href="#" className="flex items-center gap-3">
           <div
-            className="w-28 h-28 rounded-full flex items-center justify-center shadow-lg bg-[#222] overflow-hidden"
-            style={{ border: "2px solid #d4af37" }}
+            className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-[#1a1a1a]"
+            style={{ border: `1.5px solid ${GOLD}` }}
           >
             <Image
               src="/hotels/gran-imperio/logo.png"
-              alt="Gran Imperio Logo"
-              width={112}
-              height={112}
-              className="w-full h-full object-contain"
-              unoptimized={true}
+              alt="Gran Imperio"
+              width={40}
+              height={40}
+              className="object-contain"
+              unoptimized
             />
           </div>
-          <div className="text-center">
-            <h1
-              className="text-3xl font-bold tracking-tight"
-              style={{ color: "#d4af37", fontFamily: "Georgia, 'Times New Roman', serif" }}
+          <span
+            className="font-bold text-base hidden sm:block"
+            style={{ color: GOLD, fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            Gran Imperio
+          </span>
+        </a>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-6">
+          {NAV_LINKS.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-sm font-medium transition-colors"
+              style={{ color: scrolled ? "#ccc" : "rgba(255,255,255,0.85)" }}
             >
-              Gran Imperio
-            </h1>
-            <p className="text-sm mt-1 tracking-widest uppercase" style={{ color: "#a88e32" }}>
-              Hotel Cerca a Todo
-            </p>
-            <p className="text-sm mt-2 max-w-[280px] leading-relaxed mx-auto text-gray-400">
-              A solo 2 cuadras de la 70, te ofrecemos la mejor ubicación al mejor precio.
-            </p>
+              {l.label}
+            </a>
+          ))}
+        </nav>
+
+        {/* CTA + burger */}
+        <div className="flex items-center gap-3">
+          <a
+            href={HOSROOM}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-85"
+            style={{ background: GOLD, color: "#111" }}
+          >
+            Reservar ahora
+          </a>
+          <button
+            className="md:hidden p-2 rounded-md"
+            onClick={() => setOpen(!open)}
+            style={{ color: GOLD }}
+            aria-label="Menú"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div
+          className="md:hidden px-4 py-5 flex flex-col gap-4"
+          style={{ background: "rgba(8,8,8,0.97)", borderTop: `1px solid ${GOLD}25` }}
+        >
+          {NAV_LINKS.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-sm font-medium"
+              style={{ color: "#ccc" }}
+              onClick={() => setOpen(false)}
+            >
+              {l.label}
+            </a>
+          ))}
+          <a
+            href={HOSROOM}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex justify-center items-center px-4 py-2.5 rounded-lg text-sm font-semibold"
+            style={{ background: GOLD, color: "#111" }}
+            onClick={() => setOpen(false)}
+          >
+            Reservar ahora
+          </a>
+        </div>
+      )}
+    </header>
+  );
+}
+
+// ─── Hero CTA ─────────────────────────────────────────────────────────────────
+function HeroCTA() {
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a
+        href="#reservar"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("reservar")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="inline-flex items-center gap-2 font-semibold px-8 py-3.5 rounded-2xl text-sm shadow-xl transition-opacity hover:opacity-88"
+        style={{ background: GOLD, color: "#111" }}
+      >
+        Verificar disponibilidad
+      </a>
+      <a
+        href={WA}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 font-semibold px-6 py-3.5 rounded-2xl text-sm transition-opacity hover:opacity-80"
+        style={{
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          color: "#fff",
+          backdropFilter: "blur(12px)",
+        }}
+      >
+        <WAIcon size={16} />
+        Consultar por WhatsApp
+      </a>
+    </div>
+  );
+}
+
+// ─── Room Card ────────────────────────────────────────────────────────────────
+function RoomCard({ room, index }: { room: (typeof ROOMS)[0]; index: number }) {
+  const [idx, setIdx] = useState(0);
+  const prev = () => setIdx((i) => (i === 0 ? room.images.length - 1 : i - 1));
+  const next = () => setIdx((i) => (i === room.images.length - 1 ? 0 : i + 1));
+
+  return (
+    <motion.div
+      {...fadeUp(index * 0.1)}
+      className="rounded-2xl overflow-hidden flex flex-col"
+      style={{ background: "#181818", border: `1px solid ${GOLD}28` }}
+    >
+      {/* Carousel */}
+      <div className="relative h-56">
+        <Image
+          src={room.images[idx]}
+          alt={room.name}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+        {room.images.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-black/55 text-white hover:bg-black/75 transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-black/55 text-white hover:bg-black/75 transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {room.images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setIdx(i)}
+                  className="w-1.5 h-1.5 rounded-full transition-colors"
+                  style={{ background: i === idx ? GOLD : "rgba(255,255,255,0.4)" }}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        {/* Capacity badge */}
+        <div
+          className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold"
+          style={{ background: "rgba(8,8,8,0.82)", color: GOLD, border: `1px solid ${GOLD}40` }}
+        >
+          <Users size={10} />
+          {room.capacity}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-5 flex flex-col flex-1">
+        <h3
+          className="text-lg font-bold mb-2"
+          style={{ color: GOLD, fontFamily: "Georgia, 'Times New Roman', serif" }}
+        >
+          {room.name}
+        </h3>
+        <p className="text-sm leading-relaxed flex-1 mb-4" style={{ color: "#999" }}>
+          {room.description}
+        </p>
+        <div className="flex flex-wrap gap-1 mb-5">
+          {room.amenities.map((a) => (
+            <span
+              key={a}
+              className="text-xs px-2 py-0.5 rounded-full"
+              style={{ background: `${GOLD}15`, color: GOLD_DK, border: `1px solid ${GOLD}30` }}
+            >
+              {a}
+            </span>
+          ))}
+        </div>
+        <a
+          href={HOSROOM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-85"
+          style={{ background: GOLD, color: "#111" }}
+        >
+          Ver disponibilidad
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+function Gallery() {
+  return (
+    <section id="galeria" className="py-14" style={{ background: "#0e0e0e" }}>
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div {...fadeUp()} className="text-center mb-8">
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD_DK }}>
+            Galería
+          </span>
+          <h2
+            className="text-3xl sm:text-4xl font-bold mt-2"
+            style={{ color: "#f5f5f5", fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            Vive la experiencia
+          </h2>
+          <p className="mt-3 max-w-xl mx-auto text-sm" style={{ color: "#777" }}>
+            Habitaciones modernas, baños de lujo y espacios diseñados para su confort en el corazón de Medellín.
+          </p>
+        </motion.div>
+
+        {/* Desktop: large left + 2×2 right */}
+        <div className="hidden md:grid grid-cols-3 gap-3" style={{ gridTemplateRows: "260px 260px" }}>
+          <motion.div
+            {...fadeUp(0)}
+            style={{ gridRow: "1 / 3" }}
+            className="relative overflow-hidden rounded-2xl group"
+          >
+            <Image
+              src={GALLERY[0].src}
+              alt={GALLERY[0].alt}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="33vw"
+            />
+            <div className="absolute inset-0 group-hover:bg-black/10 transition-colors" />
+          </motion.div>
+          {GALLERY.slice(1).map((photo, i) => (
+            <motion.div
+              key={i}
+              {...fadeUp(i * 0.08 + 0.1)}
+              className="relative overflow-hidden rounded-2xl group"
+              style={{ minHeight: "260px" }}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="33vw"
+              />
+              <div className="absolute inset-0 group-hover:bg-black/10 transition-colors" />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Mobile */}
+        <div className="flex flex-col gap-3 md:hidden">
+          <div className="relative h-64 rounded-2xl overflow-hidden">
+            <Image src={GALLERY[0].src} alt={GALLERY[0].alt} fill className="object-cover" sizes="100vw" />
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            {GALLERY.slice(1, 5).map((photo, i) => (
+              <div key={i} className="relative h-36 rounded-2xl overflow-hidden">
+                <Image src={photo.src} alt={photo.alt} fill className="object-cover" sizes="50vw" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Servicios ────────────────────────────────────────────────────────────────
+function Servicios() {
+  return (
+    <section id="servicios" className="py-14" style={{ background: "#080808" }}>
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div {...fadeUp()} className="text-center mb-8">
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD_DK }}>
+            Servicios
+          </span>
+          <h2
+            className="text-3xl sm:text-4xl font-bold mt-2"
+            style={{ color: "#f5f5f5", fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            Todo lo que necesitas
+          </h2>
+          <p className="mt-3 max-w-xl mx-auto text-sm" style={{ color: "#777" }}>
+            Comodidad y seguridad en cada detalle para que disfrutes al máximo tu estadía.
+          </p>
         </motion.div>
 
-        {/* Image Slider */}
-        <motion.div variants={itemVariants} className="w-full mt-4">
-          <ImageSlider
-            images={SLIDER_IMAGES}
-            accentColor="#d4af37"
-            borderColor="#333333"
-          />
-        </motion.div>
-
-        {/* Links */}
-        <div className="w-full flex flex-col gap-3 px-2 mt-4">
-          {LINKS.map((link) => (
-            <motion.a
-              key={link.id}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              variants={itemVariants}
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-4 px-5 py-4 rounded-2xl shadow-lg transition-shadow hover:shadow-xl"
-              style={
-                link.primary
-                  ? {
-                      background: "linear-gradient(135deg, #d4af37 0%, #b89322 100%)",
-                      color: "#111",
-                    }
-                  : {
-                      background: "rgba(30,30,30,0.85)",
-                      border: "1px solid #d4af3744",
-                      color: "#e5e5e5",
-                      backdropFilter: "blur(12px)",
-                    }
-              }
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          {AMENITIES.map(({ Icon, label, desc }, i) => (
+            <motion.div
+              key={label}
+              {...fadeUp(i * 0.08)}
+              className="flex flex-col items-center text-center p-6 rounded-2xl"
+              style={{ background: "#181818", border: `1px solid ${GOLD}20` }}
             >
               <div
-                className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-                style={
-                  link.primary
-                    ? { background: "rgba(0,0,0,0.15)" }
-                    : { background: "linear-gradient(135deg, #d4af3722 0%, #d4af3711 100%)", color: "#d4af37" }
-                }
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
+                style={{ background: `${GOLD}15` }}
               >
-                {link.icon}
+                <Icon size={22} style={{ color: GOLD }} />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm">{link.label}</p>
-                {link.sublabel && (
-                  <p
-                    className="text-xs mt-0.5"
-                    style={{ color: link.primary ? "rgba(0,0,0,0.7)" : "#a88e32" }}
+              <p className="font-semibold text-sm mb-1" style={{ color: "#f5f5f5" }}>
+                {label}
+              </p>
+              <p className="text-xs" style={{ color: "#666" }}>
+                {desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Check-in / Check-out info */}
+        <motion.div {...fadeUp(0.4)} className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
+          {[
+            { label: "Check-in",  value: "3:00 PM" },
+            { label: "Check-out", value: "1:00 PM" },
+            { label: "Recepción", value: "24 horas" },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="text-center px-8 py-4 rounded-2xl"
+              style={{ background: "#181818", border: `1px solid ${GOLD}25` }}
+            >
+              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: GOLD_DK }}>
+                {item.label}
+              </p>
+              <p className="font-bold text-lg" style={{ color: "#f5f5f5" }}>
+                {item.value}
+              </p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Ubicación ────────────────────────────────────────────────────────────────
+function Ubicacion() {
+  const steps = [
+    {
+      icon: "🚇",
+      from: "Metro",
+      to: "Estación Estadio",
+      desc: "Línea A del Metro de Medellín. Baje en Estación Estadio, a solo 450 m del hotel.",
+    },
+    {
+      icon: "🚌",
+      from: "Bus",
+      to: "Avenida 70",
+      desc: "Múltiples rutas de bus transitan por la 70. El hotel está a 2 cuadras.",
+    },
+    {
+      icon: "🚕",
+      from: "Taxi / Uber",
+      to: "Cra 69 #43-32",
+      desc: "Diga al conductor: Cra 69 con calle 43, barrio Laureles-Estadio.",
+    },
+    {
+      icon: "🏨",
+      from: "Llegada",
+      to: "Gran Imperio",
+      desc: "Check-in desde las 3:00 PM. Recepción 24 horas siempre disponible.",
+    },
+  ];
+
+  return (
+    <section id="ubicacion" className="py-14" style={{ background: "#111" }}>
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div {...fadeUp()} className="text-center mb-8">
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD_DK }}>
+            Ubicación
+          </span>
+          <h2
+            className="text-3xl sm:text-4xl font-bold mt-2"
+            style={{ color: "#f5f5f5", fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            En el corazón de Laureles
+          </h2>
+          <p className="mt-3 max-w-xl mx-auto text-sm" style={{ color: "#777" }}>
+            A solo 2 cuadras de la 70 y 450 m del metro Estadio. La mejor ubicación al mejor precio.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Steps */}
+          <div className="space-y-1">
+            {steps.map((step, i) => (
+              <motion.div key={i} {...fadeUp(i * 0.1)} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0"
+                    style={{ background: "#1a1a1a", border: `1px solid ${GOLD}40` }}
                   >
-                    {link.sublabel}
-                  </p>
-                )}
-              </div>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                className="w-4 h-4 flex-shrink-0 opacity-50"
+                    {step.icon}
+                  </div>
+                  {i < steps.length - 1 && (
+                    <div className="w-px flex-1 mt-2" style={{ background: `${GOLD}20`, minHeight: "28px" }} />
+                  )}
+                </div>
+                <div className="pb-7">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="font-semibold text-sm" style={{ color: "#e5e5e5" }}>{step.from}</span>
+                    <span style={{ color: GOLD }}>→</span>
+                    <span className="font-semibold text-sm" style={{ color: GOLD }}>{step.to}</span>
+                  </div>
+                  <p className="text-sm" style={{ color: "#888" }}>{step.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Map */}
+          <motion.div {...fadeUp(0.2)}>
+            <div
+              className="rounded-2xl overflow-hidden shadow-xl"
+              style={{ border: `1px solid ${GOLD}30` }}
+            >
+              <iframe
+                src="https://maps.google.com/maps?q=Hotel+Gran+Imperio+Medellin&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                width="100%"
+                height="320"
+                style={{ border: 0, display: "block" }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Ubicación Hotel Gran Imperio"
+              />
+            </div>
+            <a
+              href="https://www.google.com/maps/place/Hotel+Gran+Imperio/@6.2484959,-75.5873436,17z"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 text-sm mt-3 hover:underline"
+              style={{ color: GOLD }}
+            >
+              <MapPin size={14} />
+              Cra 69 #43-32, Barrio Laureles, Medellín
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Contacto ─────────────────────────────────────────────────────────────────
+function Contacto() {
+  const items = [
+    {
+      label: "WhatsApp",
+      value: "312 836 9410",
+      href: WA,
+      bg: "#25D366",
+      icon: <WAIcon size={22} />,
+      textColor: "white",
+    },
+    {
+      label: "Teléfono",
+      value: "312 836 9410",
+      href: PHONE_,
+      bg: GOLD,
+      icon: <Phone size={22} color="#111" />,
+      textColor: "#111",
+    },
+    {
+      label: "Email",
+      value: "hotelgranimperio1",
+      href: EMAIL_,
+      bg: "#1a1a1a",
+      icon: <Mail size={22} style={{ color: GOLD }} />,
+      textColor: "white",
+    },
+    {
+      label: "Instagram",
+      value: "@hotelgranimperio",
+      href: IG,
+      bg: "linear-gradient(135deg,#f09433 0%,#dc2743 50%,#bc1888 100%)",
+      icon: (
+        <svg width={22} height={22} viewBox="0 0 24 24" fill="white">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+        </svg>
+      ),
+      textColor: "white",
+    },
+  ];
+
+  return (
+    <section id="contacto" className="py-14" style={{ background: "#0a0a0a" }}>
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div {...fadeUp()} className="text-center mb-8">
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD_DK }}>
+            Contacto
+          </span>
+          <h2
+            className="text-3xl sm:text-4xl font-bold mt-2"
+            style={{ color: "#f5f5f5", fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            Estamos para servirle
+          </h2>
+          <p className="mt-3 max-w-xl mx-auto text-sm" style={{ color: "#777" }}>
+            Recepción 24 horas. Escríbanos o llámenos y respondemos de inmediato.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {items.map((item, i) => (
+            <motion.a
+              key={item.label}
+              href={item.href}
+              target={item.href.startsWith("http") ? "_blank" : undefined}
+              rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              {...fadeUp(i * 0.08)}
+              whileHover={{ y: -4 }}
+              className="flex flex-col items-center text-center p-6 rounded-2xl transition-all"
+              style={{ background: "#181818", border: `1px solid ${GOLD}22` }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
+                style={{ background: item.bg }}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-              </svg>
+                {item.icon}
+              </div>
+              <span
+                className="text-xs font-semibold uppercase tracking-wider mb-1"
+                style={{ color: "#555" }}
+              >
+                {item.label}
+              </span>
+              <span className="text-sm font-medium" style={{ color: "#e5e5e5" }}>
+                {item.value}
+              </span>
             </motion.a>
           ))}
         </div>
 
-        {/* Map */}
-        <motion.div variants={itemVariants} className="w-full px-2 mt-4">
-          <div
-            className="w-full rounded-2xl overflow-hidden shadow-lg"
-            style={{ border: "1px solid #444" }}
-          >
-            <iframe
-              src="https://maps.google.com/maps?q=Hotel+Gran+Imperio+Medellin&t=&z=15&ie=UTF8&iwloc=&output=embed"
-              width="100%"
-              height="180"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Ubicación Hotel Gran Imperio"
-            />
-          </div>
+        <motion.div {...fadeUp(0.4)} className="text-center mt-10">
           <a
-            href="https://www.google.com/maps/place/Hotel+Gran+Imperio/@6.2390272,-75.5761152,13z/data=!4m9!3m8!1s0x8e44298c76040667:0xa4179481d2f6c82f!5m2!4m1!1i2!8m2!3d6.2484959!4d-75.5873436!16s%2Fg%2F11r_vs0byb?authuser=0&entry=ttu&g_ep=EgoyMDI2MDQxMi4wIKXMDSoASAFQAw%3D%3D"
+            href={WA}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-sm mt-3 hover:underline"
-            style={{ color: "#d4af37" }}
+            className="inline-flex items-center gap-3 font-semibold px-8 py-4 rounded-2xl shadow-lg transition-opacity hover:opacity-90 text-base"
+            style={{ background: "#25D366", color: "white" }}
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
-              <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.083 3.978-5.121 3.978-8.827a8.25 8.25 0 00-16.5 0c0 3.706 2.034 6.744 3.978 8.827a19.576 19.576 0 002.854 2.715l.018.013.004.003zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-            </svg>
-            <span>69 # 43-32, Medellín</span>
+            <WAIcon size={22} />
+            Reservar por WhatsApp
           </a>
+          <p className="text-xs mt-3" style={{ color: "#444" }}>
+            O usa nuestro{" "}
+            <a href={HOSROOM} target="_blank" rel="noopener noreferrer" style={{ color: GOLD_DK, textDecoration: "underline" }}>
+              motor de reservas oficial
+            </a>{" "}
+            para garantizar el mejor precio
+          </p>
         </motion.div>
+      </div>
 
-        {/* Divider */}
-        <motion.div variants={itemVariants} className="w-full px-2 flex items-center gap-3 mt-4">
-          <div className="flex-1 h-px" style={{ background: "#444" }} />
-          <span className="text-xs tracking-widest uppercase" style={{ color: "#888" }}>
-            Contáctanos
-          </span>
-          <div className="flex-1 h-px" style={{ background: "#444" }} />
-        </motion.div>
+      {/* Floating WA button */}
+      <a
+        href={WA}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110"
+        style={{ background: "#25D366" }}
+        aria-label="WhatsApp"
+      >
+        <WAIcon size={28} />
+      </a>
+    </section>
+  );
+}
 
-        {/* Footer */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col items-center gap-3 pb-6 mt-4"
-        >
+// ─── Footer ───────────────────────────────────────────────────────────────────
+function Footer() {
+  return (
+    <footer
+      className="py-10 px-4"
+      style={{ background: "#050505", borderTop: `1px solid ${GOLD}18` }}
+    >
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* Brand */}
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-full overflow-hidden shrink-0"
+            style={{ border: `1.5px solid ${GOLD}` }}
+          >
+            <Image
+              src="/hotels/gran-imperio/logo.png"
+              alt="Gran Imperio"
+              width={36}
+              height={36}
+              className="object-contain"
+              unoptimized
+            />
+          </div>
+          <div>
+            <p
+              className="font-bold text-sm"
+              style={{ color: GOLD, fontFamily: "Georgia, 'Times New Roman', serif" }}
+            >
+              Hotel Gran Imperio
+            </p>
+            <p className="text-xs" style={{ color: "#444" }}>
+              Cra 69 #43-32, Laureles, Medellín · 3★
+            </p>
+          </div>
+        </div>
+
+        {/* Nav links */}
+        <nav className="hidden md:flex items-center gap-5">
+          {NAV_LINKS.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-xs hover:underline"
+              style={{ color: "#555" }}
+            >
+              {l.label}
+            </a>
+          ))}
+        </nav>
+
+        {/* Agency badge */}
+        <div className="flex flex-col items-center gap-2">
           <a
             href="https://www.instagram.com/laagenciamarketing?igsh=cWZpMjI2OHdlbjl5"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl transition-opacity hover:opacity-80"
-            style={{ background: "rgba(30,30,30,0.6)", border: "1px solid #444" }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl hover:opacity-80 transition-opacity"
+            style={{ background: "#181818", border: `1px solid ${GOLD}28` }}
           >
             <Image
               src="/logo-laagencia.png"
               alt="La Agencia"
-              width={22}
-              height={22}
+              width={20}
+              height={20}
               className="object-contain"
             />
-            <span className="text-xs" style={{ color: "#d4af37" }}>
+            <span className="text-xs" style={{ color: GOLD }}>
               Impulsado por <strong>La Agencia</strong>
             </span>
           </a>
-          <p className="text-[10px]" style={{ color: "#666" }}>
-            Desarrollado por AIC Studio
+          <p className="text-[10px]" style={{ color: "#333" }}>
+            © 2026 Hotel Gran Imperio · Desarrollado por AIC Studio
           </p>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default function GranImperioPage() {
+  return (
+    <div style={{ background: "#111", color: "#f5f5f5" }}>
+      <Navbar />
+
+      {/* ── Hero ── */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Dark base — detrás del video */}
+        <div className="absolute inset-0" style={{ background: "#080808" }} />
+
+        {/* Background video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: 0.45 }}
+        >
+          <source src="/hotels/gran-imperio/bg-video.mp4" type="video/mp4" />
+        </video>
+
+        {/* Gradient overlay — oscurece bordes, preserva video al centro */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.65) 100%)",
+          }}
+        />
+
+        {/* Gold vignette accent */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at 50% 40%, ${GOLD}10 0%, transparent 65%)`,
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pt-20">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-6"
+            style={{
+              background: `${GOLD}18`,
+              border: `1px solid ${GOLD}40`,
+              color: GOLD,
+            }}
+          >
+            Laureles · Estadio · Medellín
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.22, ease: EASE }}
+            className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight mb-5 drop-shadow-2xl"
+            style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            <span style={{ color: "#f5f5f5" }}>Hotel</span>{" "}
+            <span style={{ color: GOLD }}>Gran</span>
+            <br />
+            <span style={{ color: "#f5f5f5" }}>Imperio</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.38, ease: EASE }}
+            className="text-base sm:text-lg max-w-xl mx-auto mb-7 leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.75)" }}
+          >
+            Hotel 3 estrellas en el corazón de Laureles. A solo 2 cuadras de la 70 y
+            450 m del metro. Desayuno americano incluido.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.52, ease: EASE }}
+          >
+            <HeroCTA />
+          </motion.div>
+
+          {/* Trust badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.75 }}
+            className="flex items-center justify-center gap-6 mt-8 flex-wrap"
+          >
+            {["58 habitaciones", "Hotel 3★", "Desayuno incluido", "Pet Friendly"].map((badge) => (
+              <span key={badge} className="flex items-center gap-1.5 text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                <span style={{ color: GOLD }}>✦</span> {badge}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div
+            className="w-5 h-8 rounded-full flex justify-center pt-1.5"
+            style={{ border: `2px solid ${GOLD}55` }}
+          >
+            <div className="w-1 h-2 rounded-full" style={{ background: `${GOLD}55` }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Habitaciones ── */}
+      <section id="habitaciones" className="py-14" style={{ background: "#111" }}>
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div {...fadeUp()} className="text-center mb-8">
+            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD_DK }}>
+              Nuestras habitaciones
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl font-bold mt-2"
+              style={{ color: "#f5f5f5", fontFamily: "Georgia, 'Times New Roman', serif" }}
+            >
+              Comodidad y distinción
+            </h2>
+            <p className="mt-3 max-w-xl mx-auto text-sm" style={{ color: "#777" }}>
+              58 habitaciones con baños en mármol negro, TV satelital y WiFi de alta velocidad.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ROOMS.map((room, i) => (
+              <RoomCard key={room.id} room={room} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Motor de reservas ── */}
+      <section id="reservar" className="py-14" style={{ background: "#0a0a0a" }}>
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.div {...fadeUp()} className="text-center mb-8">
+            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: GOLD_DK }}>
+              Reservas en línea
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl font-bold mt-2"
+              style={{ color: "#f5f5f5", fontFamily: "Georgia, 'Times New Roman', serif" }}
+            >
+              Reserva directamente aquí
+            </h2>
+            <p className="mt-2 max-w-xl mx-auto text-sm" style={{ color: "#777" }}>
+              Mejor precio garantizado · Solo en nuestro sitio oficial.
+            </p>
+          </motion.div>
+
+          <motion.div
+            {...fadeUp(0.1)}
+            className="rounded-2xl overflow-hidden shadow-2xl"
+            style={{ border: `1px solid ${GOLD}35` }}
+          >
+            {/* Header integrado */}
+            <div
+              className="flex items-center justify-between px-5 py-3"
+              style={{
+                background: "#181818",
+                borderBottom: `1px solid ${GOLD}25`,
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-full overflow-hidden shrink-0"
+                  style={{ border: `1px solid ${GOLD}60` }}
+                >
+                  <Image
+                    src="/hotels/gran-imperio/logo.png"
+                    alt="Gran Imperio"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+                <div>
+                  <p className="text-xs font-bold" style={{ color: GOLD }}>
+                    Hotel Gran Imperio
+                  </p>
+                  <p className="text-[10px]" style={{ color: "#555" }}>
+                    Motor de reservas oficial · Pago seguro
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ background: `${GOLD}18`, color: GOLD, border: `1px solid ${GOLD}35` }}
+                >
+                  ✦ Mejor precio
+                </span>
+              </div>
+            </div>
+
+            {/* iframe */}
+            <iframe
+              src="https://sys.hosroom.com/booking/148-hotel-gran-imperio"
+              width="100%"
+              height="520"
+              style={{ border: 0, display: "block", background: "#fff" }}
+              loading="lazy"
+              title="Motor de reservas Hotel Gran Imperio"
+            />
+
+            {/* Footer integrado */}
+            <div
+              className="flex items-center justify-center gap-4 px-5 py-3 flex-wrap"
+              style={{ background: "#181818", borderTop: `1px solid ${GOLD}20` }}
+            >
+              <span className="text-[10px] flex items-center gap-1" style={{ color: "#555" }}>
+                🔒 Pago 100% seguro
+              </span>
+              <span className="text-[10px]" style={{ color: "#333" }}>·</span>
+              <span className="text-[10px]" style={{ color: "#555" }}>
+                Recepción 24 h · +57 312 836 9410
+              </span>
+              <span className="text-[10px]" style={{ color: "#333" }}>·</span>
+              <a
+                href={WA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] hover:underline"
+                style={{ color: GOLD_DK }}
+              >
+                ¿Necesitas ayuda? WhatsApp
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <Gallery />
+      <Servicios />
+      <Ubicacion />
+      <Contacto />
+      <Footer />
     </div>
   );
 }
