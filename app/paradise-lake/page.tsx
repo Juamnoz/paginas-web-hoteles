@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import TechnoBackground from "./TechnoBackground";
+import MusicPlayer from "./MusicPlayer";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -26,12 +26,12 @@ const PROGRAM = [
     day: "Viernes 1 May", tag: "Festivo",
     items: [
       { time: "12:00 PM", desc: "Apertura de puertas" },
-      { time: "1:00 – 3:00 PM", desc: "🍹 Barra libre" },
+      { time: "1:00 – 3:00 PM", desc: "Barra libre" },
       { time: "Desde las 2 PM", desc: "Techno & Techno House · 6 DJs los 2 días" },
     ],
   },
   {
-    day: "Sábado 2 May", tag: "🎛️ Techno",
+    day: "Sábado 2 May", tag: "Techno",
     items: [
       { time: "Todo el día", desc: "Techno & Techno House non-stop" },
       { time: "Non-stop", desc: "6 DJs · 24 horas de música · 2 días" },
@@ -40,12 +40,12 @@ const PROGRAM = [
 ];
 
 const ROOMS = [
-  { id: "pareja", title: "Habitación en pareja", price: "$600.000", priceValue: 600000, unit: "por pareja", personas: 2, detail: "15 habitaciones disponibles · Se agotan rápido", primary: true, badge: "Incluye estadía", icon: "🏠" },
-  { id: "individual", title: "Boleta individual", price: "$250.000", priceValue: 250000, unit: "por persona", personas: 1, detail: "Acceso al evento sin estadía", primary: false, badge: "Sin estadía", icon: "🎫" },
+  { id: "pareja", title: "Habitación en pareja", price: "$600.000", priceValue: 600000, unit: "por pareja", personas: 2, detail: "15 habitaciones · Se agotan rápido", primary: true, badge: "Estadía incluida" },
+  { id: "individual", title: "Acceso individual", price: "$250.000", priceValue: 250000, unit: "por persona", personas: 1, detail: "Entrada al evento sin estadía", primary: false, badge: "Solo entrada" },
 ];
 
 const ADDONS = [
-  { id: "transporte", title: "Transporte ida y vuelta", price: "$40.000", priceValue: 40000, unit: "por persona", personas: 1, detail: "Salida desde Medellín y regreso incluidos", badge: "Opcional", icon: "🚌" },
+  { id: "transporte", title: "Transporte ida y vuelta", price: "$40.000", priceValue: 40000, unit: "por persona", personas: 1, detail: "Salida desde Medellín · Regreso incluido", badge: "Opcional" },
 ];
 
 type SessionUser = { id: string; name: string; email: string };
@@ -286,38 +286,77 @@ function ParadiseLakePageInner() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#050f1e" }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0C0808" }}>
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-start justify-center py-10 px-4" style={{ background: "#050f1e" }}>
+    <div className="min-h-screen flex items-start justify-center py-10 px-4" style={{ background: "#0C0808" }}>
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none select-none overflow-hidden">
-        <TechnoBackground />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(2,5,9,0.45) 0%, rgba(2,5,9,0.3) 50%, rgba(2,5,9,0.6) 100%)" }} />
+        <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" style={{ opacity: 0.55 }}>
+          <source src="/fondo-sun-senssion.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(12,8,8,0.5) 0%, rgba(12,8,8,0.25) 40%, rgba(12,8,8,0.7) 100%)" }} />
       </div>
 
       <motion.div className="w-full max-w-[430px] flex flex-col items-center gap-6 relative z-10" variants={containerVariants} initial="hidden" animate="visible">
 
         {/* ── Header ── */}
-        <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 pt-2 text-center w-full">
-          <div className="w-28 h-28 rounded-2xl overflow-hidden shadow-2xl" style={{ border: "1.5px solid rgba(247,148,29,0.2)", boxShadow: "0 0 40px rgba(247,148,29,0.15), 0 8px 32px rgba(0,0,0,0.5)" }}>
-            <img src="/logo-paradise-lake.jpeg" alt="Paradise Lake" className="w-full h-full object-cover" />
+        <motion.div variants={itemVariants} className="flex flex-col items-center text-center w-full" style={{ paddingTop: 24, gap: 0 }}>
+
+          {/* fecha sobre el logo */}
+          <p style={{ fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(232,160,32,0.7)", marginBottom: 20, fontWeight: 600 }}>
+            1 y 2 de Mayo · Guatapé
+          </p>
+
+          {/* logo principal — sin caja, sin borde, domina el espacio */}
+          <div style={{ position: "relative", width: "100%", display: "flex", justifyContent: "center", marginBottom: 20 }}>
+            {/* glow detrás del logo */}
+            <div style={{
+              position: "absolute", top: "50%", left: "50%",
+              transform: "translate(-50%,-50%)",
+              width: 260, height: 80,
+              background: "radial-gradient(ellipse, rgba(232,160,32,0.35) 0%, transparent 70%)",
+              filter: "blur(24px)",
+              pointerEvents: "none",
+            }} />
+            <img
+              src="/logo-sun-senssion.png"
+              alt="SUN-SENSSION"
+              style={{
+                width: "82%", maxWidth: 340,
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 32px rgba(232,160,32,0.55)) drop-shadow(0 2px 8px rgba(0,0,0,0.8))",
+                position: "relative",
+              }}
+            />
           </div>
-          <div>
-            <p className="text-xs tracking-[0.3em] uppercase mb-1" style={{ color: "#F7941D" }}>1 y 2 de Mayo · Guatapé</p>
-            <h1 className="text-3xl font-black tracking-tight leading-tight" style={{ color: "#ffffff", fontFamily: "Georgia, 'Times New Roman', serif", textShadow: "0 0 40px rgba(247,148,29,0.3)" }}>Paradise Lake</h1>
-            <p className="text-base font-semibold mt-1 tracking-wide" style={{ color: "#2BAF9E" }}>Techno & Techno House · Peñol, Antioquia</p>
-            <p className="text-sm mt-3 max-w-[300px] mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>6 DJs · 24 horas de música · Barra libre · Estadía incluida</p>
+
+          {/* badge TECHNO */}
+          <div style={{
+            display: "inline-flex", alignItems: "center",
+            padding: "5px 18px", borderRadius: 99, marginBottom: 20,
+            background: "rgba(232,160,32,0.1)",
+            boxShadow: "inset 0 0 0 1px rgba(232,160,32,0.3)",
+          }}>
+            <span style={{ fontSize: 11, letterSpacing: "0.35em", textTransform: "uppercase", fontWeight: 700, color: "#E8A020" }}>
+              Techno
+            </span>
           </div>
+
+          {/* subtítulo */}
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", letterSpacing: "0.04em", lineHeight: 1.6, marginBottom: 0 }}>
+            Techno House · Peñol, Antioquia
+          </p>
+
           {/* User bar */}
           {user && (
-            <div className="flex items-center gap-3 px-4 py-2 rounded-xl w-full justify-between" style={{ background: "rgba(247,148,29,0.08)", border: "1px solid rgba(247,148,29,0.2)" }}>
-              <span className="text-sm font-semibold" style={{ color: "#F7941D" }}>👤 {user.name}</span>
-              <button onClick={handleLogout} className="text-xs px-3 py-1 rounded-lg" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl w-full justify-between mt-5" style={{ background: "rgba(232,160,32,0.06)", boxShadow: "inset 0 0 0 1px rgba(232,160,32,0.15)" }}>
+              <span className="text-sm font-semibold" style={{ color: "rgba(232,160,32,0.9)" }}>{user.name}</span>
+              <button onClick={handleLogout} className="text-xs px-3 py-1 rounded-lg" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 Salir
               </button>
             </div>
@@ -327,31 +366,52 @@ function ParadiseLakePageInner() {
         {/* ── Highlights ── */}
         <motion.div variants={itemVariants} className="w-full grid grid-cols-4 gap-2 px-1">
           {HIGHLIGHTS.map((h) => (
-            <div key={h.label} className="flex flex-col items-center py-3 px-1 rounded-xl" style={{ background: "rgba(247,148,29,0.06)", border: "1px solid rgba(247,148,29,0.18)" }}>
-              <span className="font-black text-base leading-none" style={{ color: "#F7941D" }}>{h.value}</span>
-              <span className="text-[10px] mt-1 text-center leading-tight" style={{ color: "rgba(255,255,255,0.5)" }}>{h.label}</span>
+            <div key={h.label} className="flex flex-col items-center py-3 px-1 rounded-xl"
+              style={{ background: "rgba(255,255,255,0.03)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.07)" }}>
+              <span className="font-black text-base leading-none" style={{ color: "#E8A020" }}>{h.value}</span>
+              <span className="text-[10px] mt-1 text-center leading-tight" style={{ color: "rgba(255,255,255,0.4)" }}>{h.label}</span>
             </div>
           ))}
         </motion.div>
 
         {/* ── Programa ── */}
         <motion.div variants={itemVariants} className="w-full px-1">
-          <p className="text-xs tracking-widest uppercase mb-3 px-1" style={{ color: "rgba(255,255,255,0.35)" }}>Programa</p>
-          <div className="flex flex-col gap-3">
+          <p className="text-[10px] tracking-[0.25em] uppercase mb-4 px-1" style={{ color: "rgba(255,255,255,0.3)" }}>Programa</p>
+          <div className="flex flex-col gap-2">
             {PROGRAM.map((day) => (
-              <div key={day.day} className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="font-bold text-sm" style={{ color: "#ffffff" }}>{day.day}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={day.tag.includes("Techno") ? { background: "rgba(247,148,29,0.15)", color: "#F7941D", border: "1px solid rgba(247,148,29,0.3)" } : { background: "rgba(43,175,158,0.15)", color: "#2BAF9E", border: "1px solid rgba(43,175,158,0.25)" }}>
+              <div key={day.day} className="relative rounded-2xl px-5 py-5"
+                style={{ background: "rgba(255,255,255,0.03)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.07)" }}>
+                {/* acento lateral */}
+                <div style={{
+                  position: "absolute", left: 0, top: "18%", bottom: "18%",
+                  width: 2, borderRadius: 99,
+                  background: "rgba(232,160,32,0.4)",
+                }} />
+                {/* encabezado día */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-sm font-semibold tracking-tight" style={{ color: "#ffffff" }}>{day.day}</span>
+                  <span style={{
+                    fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700,
+                    padding: "2px 8px", borderRadius: 99,
+                    background: "rgba(232,160,32,0.1)",
+                    color: "rgba(232,160,32,0.7)",
+                  }}>
                     {day.tag}
                   </span>
                 </div>
-                {day.items.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 mb-1.5">
-                    <span className="text-xs font-mono pt-0.5 shrink-0 w-28" style={{ color: "#2BAF9E" }}>{item.time}</span>
-                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>{item.desc}</span>
-                  </div>
-                ))}
+                {/* items */}
+                <div className="flex flex-col gap-3">
+                  {day.items.map((item, i) => (
+                    <div key={i} className="flex items-start gap-4">
+                      <span style={{
+                        fontSize: 11, fontWeight: 500, flexShrink: 0, width: 100,
+                        color: "rgba(212,146,42,0.75)", fontVariantNumeric: "tabular-nums",
+                        paddingTop: 1,
+                      }}>{item.time}</span>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>{item.desc}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -363,10 +423,26 @@ function ParadiseLakePageInner() {
             <video autoPlay muted loop playsInline className="w-full object-cover" style={{ maxHeight: "260px", display: "block" }}>
               <source src="/paradise-lake-bg.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-5" style={{ background: "linear-gradient(to top, rgba(2,5,9,0.75) 0%, transparent 60%)" }}>
-              <p className="font-black text-lg tracking-wide" style={{ color: "#ffffff", textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>Paradise Lake</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-5 px-4" style={{ background: "linear-gradient(to top, rgba(2,5,9,0.85) 0%, transparent 55%)" }}>
+              <div className="rounded-2xl overflow-hidden flex items-center justify-center py-3 px-5 mb-2" style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(232,160,32,0.3)", boxShadow: "0 0 40px rgba(232,160,32,0.25), 0 4px 16px rgba(0,0,0,0.6)" }}>
+                <img src="/logo-paradise-lake.jpeg" alt="Paradise Lake" className="object-contain" style={{ maxHeight: "48px", maxWidth: "160px", filter: "drop-shadow(0 0 12px rgba(232,160,32,0.4))" }} />
+              </div>
+              <p className="font-black text-base tracking-wide" style={{ color: "#ffffff", textShadow: "0 2px 12px rgba(0,0,0,0.9)" }}>Paradise Lake</p>
               <p className="text-xs tracking-widest uppercase mt-1" style={{ color: "#F7941D" }}>1 y 2 de Mayo · Guatapé</p>
             </div>
+          </div>
+        </motion.div>
+
+        {/* anchor para trigger del music player */}
+        <div id="music-trigger" style={{ height: 0 }} />
+
+        {/* ── Video Experiencia ── */}
+        <motion.div variants={itemVariants} className="w-full px-1">
+          <p className="text-xs tracking-widest uppercase mb-3 px-1" style={{ color: "rgba(255,255,255,0.35)" }}>La experiencia</p>
+          <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(247,148,29,0.2)", boxShadow: "0 0 24px rgba(247,148,29,0.08), 0 8px 24px rgba(0,0,0,0.5)" }}>
+            <video autoPlay muted loop playsInline className="w-full object-cover" style={{ maxHeight: "320px", display: "block" }}>
+              <source src="/paradise-lake-fiesta.mp4" type="video/mp4" />
+            </video>
           </div>
         </motion.div>
 
@@ -379,9 +455,9 @@ function ParadiseLakePageInner() {
               : { background: "rgba(255,80,80,0.12)", border: "1px solid rgba(255,80,80,0.35)", color: "#ff5050" }
             }>
               <p className="font-bold text-sm">
-                {pagoStatus === "exitoso" && "✅ ¡Pago recibido! Tu abono ha sido registrado."}
-                {pagoStatus === "pendiente" && "⏳ Pago pendiente. Te avisaremos cuando se confirme."}
-                {pagoStatus === "fallido" && "❌ El pago no se completó. Intenta de nuevo."}
+                {pagoStatus === "exitoso" && "Pago recibido — Tu abono ha sido registrado."}
+                {pagoStatus === "pendiente" && "Pago pendiente — Te avisaremos cuando se confirme."}
+                {pagoStatus === "fallido" && "El pago no se completó. Intenta de nuevo."}
               </p>
             </div>
           </motion.div>
@@ -395,45 +471,76 @@ function ParadiseLakePageInner() {
           /* ── GUEST: Room selector + auth CTA ── */
           <>
             <motion.div variants={itemVariants} className="w-full px-1">
-              {/* Main tickets */}
-              <p className="text-xs tracking-widest uppercase mb-3 px-1" style={{ color: "rgba(255,255,255,0.35)" }}>Elige tu experiencia</p>
-              <div className="flex flex-col gap-3">
+              <p className="text-[10px] tracking-[0.25em] uppercase mb-4 px-1" style={{ color: "rgba(255,255,255,0.3)" }}>Selecciona tu acceso</p>
+
+              {/* Room cards */}
+              <div className="flex flex-col gap-2">
                 {ROOMS.map((room) => {
                   const qty = quantities[room.id] ?? 0;
                   const selected = qty > 0;
                   return (
-                    <div key={room.id} className="flex items-center gap-3 px-4 py-4 rounded-2xl transition-all"
+                    <div key={room.id}
+                      className="relative flex items-center gap-4 px-5 py-5 rounded-2xl transition-all"
                       style={selected
-                        ? { background: "linear-gradient(135deg, rgba(247,148,29,0.18) 0%, rgba(43,175,158,0.10) 100%)", border: "1px solid rgba(247,148,29,0.45)" }
+                        ? { background: "rgba(232,160,32,0.09)", boxShadow: "inset 0 0 0 1px rgba(232,160,32,0.4), 0 8px 32px rgba(0,0,0,0.4)" }
                         : room.primary
-                        ? { background: "linear-gradient(135deg, rgba(247,148,29,0.08) 0%, rgba(43,175,158,0.04) 100%)", border: "1px solid rgba(247,148,29,0.2)" }
-                        : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }
+                        ? { background: "rgba(255,255,255,0.04)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1)" }
+                        : { background: "rgba(255,255,255,0.025)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)" }
                       }
                     >
-                      <div className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-2xl"
-                        style={{ background: selected ? "rgba(247,148,29,0.2)" : room.primary ? "rgba(247,148,29,0.12)" : "rgba(255,255,255,0.06)" }}>
-                        {room.icon}
-                      </div>
+                      {/* acento lateral izquierdo */}
+                      <div style={{
+                        position: "absolute", left: 0, top: "20%", bottom: "20%",
+                        width: 2, borderRadius: 99,
+                        background: selected ? "#E8A020" : room.primary ? "rgba(232,160,32,0.35)" : "rgba(255,255,255,0.1)",
+                        transition: "background 0.3s",
+                      }} />
+
+                      {/* info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold text-sm" style={{ color: "#ffffff" }}>{room.title}</p>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: room.primary ? "rgba(247,148,29,0.2)" : "rgba(255,107,53,0.15)", color: room.primary ? "#F7941D" : "#ff8c5a", border: `1px solid ${room.primary ? "rgba(247,148,29,0.3)" : "rgba(255,107,53,0.25)"}` }}>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-sm font-semibold tracking-tight" style={{ color: selected ? "#ffffff" : "rgba(255,255,255,0.85)" }}>
+                            {room.title}
+                          </p>
+                          <span style={{
+                            fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
+                            padding: "2px 7px", borderRadius: 99,
+                            background: selected ? "rgba(232,160,32,0.18)" : "rgba(255,255,255,0.06)",
+                            color: selected ? "#E8A020" : "rgba(255,255,255,0.35)",
+                          }}>
                             {room.badge}
                           </span>
                         </div>
-                        <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
-                          {room.price} <span style={{ color: "rgba(255,255,255,0.25)" }}>{room.unit}</span>
-                        </p>
-                        <p className="text-[10px] mt-0.5" style={{ color: "#F7941D" }}>
-                          Separa con {fmt(DEPOSIT_UNIT * room.personas)}
+                        <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>{room.detail}</p>
+                        <p className="text-[11px] mt-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>
+                          <span style={{ color: selected ? "#E8A020" : "rgba(255,255,255,0.8)", fontWeight: 700, fontSize: 13 }}>{room.price}</span>
+                          <span style={{ color: "rgba(255,255,255,0.3)" }}> / {room.unit}</span>
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <button onClick={() => adjustQty(room.id, -1)} disabled={qty === 0} className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition-all"
-                          style={{ background: qty === 0 ? "rgba(255,255,255,0.04)" : "rgba(247,148,29,0.15)", color: qty === 0 ? "rgba(255,255,255,0.2)" : "#F7941D", border: `1px solid ${qty === 0 ? "rgba(255,255,255,0.08)" : "rgba(247,148,29,0.3)"}`, cursor: qty === 0 ? "not-allowed" : "pointer" }}>−</button>
-                        <span className="w-6 text-center font-black text-base" style={{ color: qty > 0 ? "#F7941D" : "rgba(255,255,255,0.3)" }}>{qty}</span>
-                        <button onClick={() => adjustQty(room.id, 1)} className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold"
-                          style={{ background: "rgba(247,148,29,0.15)", color: "#F7941D", border: "1px solid rgba(247,148,29,0.3)", cursor: "pointer" }}>+</button>
+
+                      {/* stepper */}
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <button onClick={() => adjustQty(room.id, -1)} disabled={qty === 0}
+                          style={{
+                            width: 30, height: 30, borderRadius: "50%",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 18, fontWeight: 300, lineHeight: 1,
+                            background: qty === 0 ? "transparent" : "rgba(232,160,32,0.12)",
+                            color: qty === 0 ? "rgba(255,255,255,0.15)" : "#E8A020",
+                            border: `1px solid ${qty === 0 ? "rgba(255,255,255,0.06)" : "rgba(232,160,32,0.25)"}`,
+                            cursor: qty === 0 ? "not-allowed" : "pointer",
+                          }}>−</button>
+                        <span style={{ width: 18, textAlign: "center", fontWeight: 700, fontSize: 15, color: qty > 0 ? "#E8A020" : "rgba(255,255,255,0.25)" }}>{qty}</span>
+                        <button onClick={() => adjustQty(room.id, 1)}
+                          style={{
+                            width: 30, height: 30, borderRadius: "50%",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 18, fontWeight: 300, lineHeight: 1,
+                            background: "rgba(232,160,32,0.12)",
+                            color: "#E8A020",
+                            border: "1px solid rgba(232,160,32,0.25)",
+                            cursor: "pointer",
+                          }}>+</button>
                       </div>
                     </div>
                   );
@@ -441,74 +548,95 @@ function ParadiseLakePageInner() {
               </div>
 
               {/* Add-ons */}
-              <div className="mt-4">
-                <p className="text-xs tracking-widest uppercase mb-2 px-1" style={{ color: "rgba(255,255,255,0.25)" }}>Agregar al pedido</p>
-                <div className="flex flex-col gap-2">
-                  {ADDONS.map((addon) => {
-                    const qty = quantities[addon.id] ?? 0;
-                    const selected = qty > 0;
-                    return (
-                      <div key={addon.id} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
-                        style={selected
-                          ? { background: "rgba(43,175,158,0.12)", border: "1px solid rgba(43,175,158,0.4)" }
-                          : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderStyle: "dashed" }
-                        }
-                      >
-                        <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-xl"
-                          style={{ background: selected ? "rgba(43,175,158,0.2)" : "rgba(255,255,255,0.05)" }}>
-                          {addon.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-semibold text-sm" style={{ color: selected ? "#ffffff" : "rgba(255,255,255,0.7)" }}>{addon.title}</p>
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "rgba(43,175,158,0.15)", color: "#2BAF9E", border: "1px solid rgba(43,175,158,0.25)" }}>
-                              {addon.badge}
-                            </span>
-                          </div>
-                          <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
-                            {addon.price} <span style={{ color: "rgba(255,255,255,0.2)" }}>{addon.unit}</span>
-                            {selected && <span style={{ color: "#2BAF9E" }}> · +{fmt(qty * addon.priceValue)} al total</span>}
+              <div className="mt-3">
+                {ADDONS.map((addon) => {
+                  const qty = quantities[addon.id] ?? 0;
+                  const selected = qty > 0;
+                  return (
+                    <div key={addon.id}
+                      className="flex items-center gap-4 px-5 py-4 rounded-xl"
+                      style={selected
+                        ? { background: "rgba(232,160,32,0.06)", boxShadow: "inset 0 0 0 1px rgba(232,160,32,0.25)" }
+                        : { background: "rgba(255,255,255,0.02)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.05)" }
+                      }
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium" style={{ color: selected ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.5)" }}>
+                            {addon.title}
                           </p>
-                          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>{addon.detail}</p>
+                          <span style={{
+                            fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
+                            padding: "2px 6px", borderRadius: 99,
+                            background: "rgba(255,255,255,0.05)",
+                            color: "rgba(255,255,255,0.25)",
+                          }}>
+                            {addon.badge}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button onClick={() => adjustQty(addon.id, -1)} disabled={qty === 0} className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold transition-all"
-                            style={{ background: qty === 0 ? "rgba(255,255,255,0.03)" : "rgba(43,175,158,0.15)", color: qty === 0 ? "rgba(255,255,255,0.2)" : "#2BAF9E", border: `1px solid ${qty === 0 ? "rgba(255,255,255,0.07)" : "rgba(43,175,158,0.3)"}`, cursor: qty === 0 ? "not-allowed" : "pointer" }}>−</button>
-                          <span className="w-5 text-center font-black text-sm" style={{ color: qty > 0 ? "#2BAF9E" : "rgba(255,255,255,0.25)" }}>{qty}</span>
-                          <button onClick={() => adjustQty(addon.id, 1)} className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold"
-                            style={{ background: "rgba(43,175,158,0.15)", color: "#2BAF9E", border: "1px solid rgba(43,175,158,0.3)", cursor: "pointer" }}>+</button>
-                        </div>
+                        <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.25)" }}>
+                          {addon.detail}
+                          {selected && <span style={{ color: "#D4922A" }}> · +{fmt(qty * addon.priceValue)}</span>}
+                        </p>
+                        <p style={{ fontSize: 12, color: selected ? "#D4922A" : "rgba(255,255,255,0.35)", marginTop: 4, fontWeight: 600 }}>
+                          {addon.price} <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.25)", fontSize: 11 }}>/ {addon.unit}</span>
+                        </p>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <button onClick={() => adjustQty(addon.id, -1)} disabled={qty === 0}
+                          style={{
+                            width: 28, height: 28, borderRadius: "50%",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 16, fontWeight: 300,
+                            background: qty === 0 ? "transparent" : "rgba(212,146,42,0.12)",
+                            color: qty === 0 ? "rgba(255,255,255,0.12)" : "#D4922A",
+                            border: `1px solid ${qty === 0 ? "rgba(255,255,255,0.05)" : "rgba(212,146,42,0.2)"}`,
+                            cursor: qty === 0 ? "not-allowed" : "pointer",
+                          }}>−</button>
+                        <span style={{ width: 16, textAlign: "center", fontWeight: 700, fontSize: 13, color: qty > 0 ? "#D4922A" : "rgba(255,255,255,0.2)" }}>{qty}</span>
+                        <button onClick={() => adjustQty(addon.id, 1)}
+                          style={{
+                            width: 28, height: 28, borderRadius: "50%",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 16, fontWeight: 300,
+                            background: "rgba(212,146,42,0.12)",
+                            color: "#D4922A",
+                            border: "1px solid rgba(212,146,42,0.2)",
+                            cursor: "pointer",
+                          }}>+</button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Selection summary */}
               {hasSelection && (
-                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-3 rounded-xl px-4 py-3" style={{ background: "rgba(247,148,29,0.06)", border: "1px solid rgba(247,148,29,0.15)" }}>
-                  <div className="flex justify-between items-start">
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                  className="mt-3 rounded-xl px-5 py-4"
+                  style={{ background: "rgba(232,160,32,0.05)", boxShadow: "inset 0 0 0 1px rgba(232,160,32,0.15)" }}>
+                  <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Separa hoy</p>
-                      <p className="font-black text-base" style={{ color: "#F7941D" }}>{fmt(ALL_PRODUCTS.reduce((acc, r) => acc + (quantities[r.id] ?? 0) * DEPOSIT_UNIT * r.personas, 0))}</p>
+                      <p className="text-[10px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>Anticipo hoy</p>
+                      <p className="text-xl font-bold mt-0.5" style={{ color: "#E8A020" }}>{fmt(ALL_PRODUCTS.reduce((acc, r) => acc + (quantities[r.id] ?? 0) * DEPOSIT_UNIT * r.personas, 0))}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Total</p>
-                      <p className="font-black text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{fmt(totalSelected)}</p>
+                      <p className="text-[10px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>Total reserva</p>
+                      <p className="text-base font-semibold mt-0.5" style={{ color: "rgba(255,255,255,0.55)" }}>{fmt(totalSelected)}</p>
                     </div>
                   </div>
                   {(quantities["transporte"] ?? 0) > 0 && (
-                    <div className="mt-2 pt-2 flex flex-col gap-0.5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div className="mt-3 pt-3 flex flex-col gap-1" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                       {ROOMS.filter(r => (quantities[r.id] ?? 0) > 0).map(r => (
-                        <p key={r.id} className="text-[11px] flex justify-between" style={{ color: "rgba(255,255,255,0.35)" }}>
-                          <span>{r.title} ×{quantities[r.id]}</span>
-                          <span>{fmt(quantities[r.id] * r.priceValue)}</span>
-                        </p>
+                        <div key={r.id} className="flex justify-between">
+                          <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>{r.title} ×{quantities[r.id]}</span>
+                          <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>{fmt(quantities[r.id] * r.priceValue)}</span>
+                        </div>
                       ))}
-                      <p className="text-[11px] flex justify-between" style={{ color: "rgba(43,175,158,0.8)" }}>
-                        <span>🚌 Transporte ×{quantities["transporte"]}</span>
-                        <span>+{fmt(quantities["transporte"] * 40000)}</span>
-                      </p>
+                      <div className="flex justify-between">
+                        <span className="text-[11px]" style={{ color: "rgba(212,146,42,0.7)" }}>Transporte ×{quantities["transporte"]}</span>
+                        <span className="text-[11px]" style={{ color: "rgba(212,146,42,0.7)" }}>+{fmt(quantities["transporte"] * 40000)}</span>
+                      </div>
                     </div>
                   )}
                 </motion.div>
@@ -518,12 +646,12 @@ function ParadiseLakePageInner() {
             {/* Auth CTA */}
             <motion.div variants={itemVariants} className="w-full px-1 flex flex-col gap-3">
               <motion.button onClick={() => handleOpenAuth("register")} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                className="w-full py-4 rounded-2xl font-bold text-base"
-                style={{ background: "linear-gradient(135deg, #009ee3 0%, #0077b6 100%)", color: "#ffffff", boxShadow: "0 0 24px rgba(0,158,227,0.3)" }}>
-                {hasSelection ? "✅ Continuar con reserva" : "🎟️ Crear cuenta y reservar"}
+                className="w-full py-4 rounded-2xl font-semibold text-sm tracking-wide"
+                style={{ background: "linear-gradient(135deg, #E8A020 0%, #C17000 100%)", color: "#000000", letterSpacing: "0.05em", boxShadow: "0 0 32px rgba(232,160,32,0.3)" }}>
+                {hasSelection ? "Continuar con reserva" : "Crear cuenta y reservar"}
               </motion.button>
-              <button onClick={() => handleOpenAuth("login")} className="w-full py-3 rounded-2xl font-semibold text-sm"
-                style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <button onClick={() => handleOpenAuth("login")} className="w-full py-3 rounded-2xl text-sm"
+                style={{ background: "transparent", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 Ya tengo cuenta — Iniciar sesión
               </button>
             </motion.div>
@@ -597,8 +725,8 @@ function ParadiseLakePageInner() {
             )}
 
             {/* Make a payment */}
-            <div className="w-full rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(43,175,158,0.08) 0%, rgba(247,148,29,0.04) 100%)", border: "1px solid rgba(43,175,158,0.25)" }}>
-              <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(43,175,158,0.12)" }}>
+            <div className="w-full rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(212,146,42,0.08) 0%, rgba(247,148,29,0.04) 100%)", border: "1px solid rgba(212,146,42,0.25)" }}>
+              <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(212,146,42,0.12)" }}>
                 <p className="font-black text-base" style={{ color: "#ffffff" }}>💸 Hacer un abono</p>
                 <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>Paga el monto que quieras, cuando quieras</p>
               </div>
@@ -609,7 +737,7 @@ function ParadiseLakePageInner() {
                     <button key={amt} onClick={() => setAbonoInput(amt.toLocaleString("es-CO"))}
                       className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                       style={abonoValue === amt
-                        ? { background: "rgba(43,175,158,0.3)", color: "#2BAF9E", border: "1px solid rgba(43,175,158,0.5)" }
+                        ? { background: "rgba(212,146,42,0.3)", color: "#D4922A", border: "1px solid rgba(212,146,42,0.5)" }
                         : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)" }}>
                       {fmt(amt)}
                     </button>
@@ -624,11 +752,11 @@ function ParadiseLakePageInner() {
                 </div>
 
                 {/* Custom amount input */}
-                <div className="flex items-center gap-2 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(43,175,158,0.2)" }}>
-                  <span className="text-base font-black" style={{ color: "#2BAF9E" }}>$</span>
+                <div className="flex items-center gap-2 rounded-xl px-4 py-3" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(212,146,42,0.2)" }}>
+                  <span className="text-base font-black" style={{ color: "#D4922A" }}>$</span>
                   <input type="text" inputMode="numeric" placeholder="Otro monto" value={abonoInput} onChange={handleAbonoInput}
                     className="flex-1 bg-transparent outline-none text-base font-bold"
-                    style={{ color: "#ffffff", caretColor: "#2BAF9E" }} />
+                    style={{ color: "#ffffff", caretColor: "#D4922A" }} />
                   <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>COP</span>
                 </div>
                 {abonoValue > 0 && abonoValue < minAbono && (
@@ -644,10 +772,10 @@ function ParadiseLakePageInner() {
                   whileTap={{ scale: loadingAbono || abonoValue < minAbono ? 1 : 0.97 }}
                   className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm"
                   style={{
-                    background: loadingAbono || abonoValue < minAbono ? "rgba(43,175,158,0.08)" : "linear-gradient(135deg, #009ee3 0%, #0077b6 100%)",
-                    color: loadingAbono || abonoValue < minAbono ? "rgba(255,255,255,0.3)" : "#ffffff",
+                    background: loadingAbono || abonoValue < minAbono ? "rgba(212,146,42,0.08)" : "linear-gradient(135deg, #E8A020 0%, #C17000 100%)",
+                    color: loadingAbono || abonoValue < minAbono ? "rgba(255,255,255,0.3)" : "#000000",
                     cursor: loadingAbono || abonoValue < minAbono ? "not-allowed" : "pointer",
-                    boxShadow: loadingAbono || abonoValue < minAbono ? "none" : "0 0 24px rgba(0,158,227,0.3)",
+                    boxShadow: loadingAbono || abonoValue < minAbono ? "none" : "0 0 24px rgba(232,160,32,0.4)",
                   }}>
                   {loadingAbono ? <><Spinner /> Generando link…</> : abonoValue >= minAbono ? <>
                     <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 shrink-0"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" /></svg>
@@ -902,6 +1030,7 @@ export default function ParadiseLakePage() {
   return (
     <Suspense>
       <ParadiseLakePageInner />
+      <MusicPlayer />
     </Suspense>
   );
 }
