@@ -669,7 +669,7 @@ function ParadiseLakePageInner() {
                 <div className="px-5 py-4 flex flex-col gap-2">
                   {reservations.map((r) => (
                     <div key={r.id} className="flex justify-between items-center">
-                      <span className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>{ROOMS.find(rm => rm.id === r.room_type)?.icon || "🎫"} {r.room_title} × {r.quantity}</span>
+                      <span className="text-sm" style={{ color: "rgba(255,255,255,0.8)" }}>{"🎫"} {r.room_title} × {r.quantity}</span>
                       <span className="text-sm font-bold" style={{ color: "#ffffff" }}>{fmt(r.total_price)}</span>
                     </div>
                   ))}
@@ -913,7 +913,7 @@ function ParadiseLakePageInner() {
                     <p className="text-[11px] font-medium mb-2" style={{ color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Cupos seleccionados</p>
                     {ROOMS.filter((r) => (quantities[r.id] ?? 0) > 0).map((r) => (
                       <div key={r.id} className="flex justify-between items-center py-0.5">
-                        <span className="text-[13px]" style={{ color: "rgba(255,255,255,0.7)" }}>{r.icon} {r.title} × {quantities[r.id]}</span>
+                        <span className="text-[13px]" style={{ color: "rgba(255,255,255,0.7)" }}>{"🎫"} {r.title} × {quantities[r.id]}</span>
                         <span className="text-[13px] font-medium" style={{ color: "#ffffff" }}>{fmt(r.priceValue * (quantities[r.id] ?? 0))}</span>
                       </div>
                     ))}
